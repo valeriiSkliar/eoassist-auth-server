@@ -1,5 +1,6 @@
 import { auth } from "auth";
 import { NextResponse } from "next/server";
+import { generateApiKey } from "./lib/generate-api-key";
 
 export function getSubdomain(url: string): string  {
   if (!url) {
@@ -19,6 +20,7 @@ export function getSubdomain(url: string): string  {
 
 
 export default auth(async (req) => {
+  req.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
   const response = NextResponse.next()
   const regex = /(?<=\/\/)[^\.]+(?=\.)/;
 
