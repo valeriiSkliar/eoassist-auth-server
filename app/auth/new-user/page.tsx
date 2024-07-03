@@ -3,13 +3,15 @@ import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
 import { redirect } from "next/navigation";
 
-const NewUserPage = async ({searchParams}: {searchParams: {url?: string}}) => { 
+const NewUserPage = async ({searchParams}: {searchParams: {callbackUrl?: string}}) => { 
     const session = await auth()
     const urlStartSession = new URL('/api/start-session', Env.NEXTAUTH_URL);
+    loger.info('url', searchParams)
 
+    const url = new URL('/auth/authorization',searchParams?.callbackUrl ?? Env.DOMAIN);
     if (session) {
         loger.info('session-new-user-page', session)
-        const url = new URL('/auth/authorization',searchParams?.url ?? '/');
+        const url = new URL('/auth/authorization',searchParams?.callbackUrl ?? Env.DOMAIN);
 
             const response = await fetch(
                 urlStartSession.toString(), 

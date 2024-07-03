@@ -12,7 +12,7 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
 
   if(session) {
     loger.info('session-main-page', session)
-      const url = new URL('/auth/authorization',searchParams?.callbackUrl ?? '/');
+      const url = new URL('/auth/authorization',searchParams?.callbackUrl ?? Env.DOMAIN);
       const response = await fetch(urlStartSession.toString(), { 
         method: 'POST', 
         headers: {

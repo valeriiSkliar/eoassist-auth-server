@@ -24,7 +24,7 @@ export const authConfig: NextAuthConfig = {
         },  
         async redirect({url, baseUrl}) {
         const redirectUrl = new URL('/auth/authorization', url);
-        loger.info('redirectUrl', redirectUrl)
+        // loger.info('redirectUrl', redirectUrl)
         return redirectUrl.toString();
         },
 
