@@ -13,7 +13,7 @@ export const LoginWithGoogle = () => {
     return (
 <Button
   onClick={ async () => {
-    await signIn("google", { callbackUrl: callbackUrl ?? '', redirect: false })
+    await signIn("google", { callbackUrl: callbackUrl ?? '' })
   }}
 variant="outline" className="w-full">
             <FaGoogle className="mr-2 h-5 w-5" />
