@@ -1,21 +1,33 @@
 import { auth } from "@/auth";
 import { Env } from "@/lib/Env";
+import { loger } from "@/lib/console-loger";
 import { redirect } from "next/navigation";
 
 const NewUserPage = async ({searchParams}: {searchParams: {url?: string}}) => { 
     const session = await auth()
-    const url = new URL('/api/start-session', Env.DOMAIN);
+    const urlStartSession = new URL('/api/start-session', Env.NEXTAUTH_URL);
 
     if (session) {
-    const response = await fetch(url.toString(), { method: 'POST', body: JSON.stringify({
-        user: session,
-        searchParams
-    })}).then(res => res.json()).then(data => {
+        loger.info('session-new-user-page', session)
+        const url = new URL('/auth/authorization',searchParams?.url ?? '/');
 
-        redirect(data.url)
+            const response = await fetch(
+                urlStartSession.toString(), 
+                { 
+                        method: 'POST', body: JSON.stringify({
+                        user: session,
+                        searchParams
+                    })
+                })
+                    .then(res => res.json()).then(data => {
 
-    })
-    }   
+                        redirect(data.url)
+
+                })
+                    .catch((error) => {
+                        loger.error('error-main-page', error)
+                    })
+            }   
     return (
         <div className="space-y-2">
             

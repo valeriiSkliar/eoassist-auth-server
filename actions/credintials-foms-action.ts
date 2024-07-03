@@ -34,7 +34,7 @@ export const credentialsFormAction = async (
     const password = formData.get('password') ?? '';
     const callbackUrl = formData.get('callbackUrl') ?? Env.DOMAIN;
     const url = new URL('/auth/authorization', callbackUrl.toString());
-    const urlStartSession = new URL('/api/start-session', Env.DOMAIN);
+    const urlStartSession = new URL('/api/start-session', Env.NEXTAUTH_URL);
 
 
     if (!email || !password) {

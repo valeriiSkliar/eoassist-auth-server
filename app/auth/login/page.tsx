@@ -8,7 +8,7 @@ import { LoginWithGoogle } from "./login-component-google"
 const LoginPage = async ({searchParams}: {searchParams: {callbackUrl?: string}}) => {
     const head = headers()
     const session = await auth()
-    const url = new URL('/api/start-session', Env.DOMAIN);
+    const url = new URL('/api/start-session', Env.NEXTAUTH_URL);
 
     if(session) {
         const url = new URL('/auth/authorization',searchParams?.callbackUrl ?? Env.DOMAIN);
