@@ -30,7 +30,10 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
       // })
       .catch((error) => {
         // TODO show error tost
-        loger.error('error-main-page', error)
+        loger.error('error-main-page', {
+          message: error.message,
+          stack: error.stack
+        })
       })
   }
   return (

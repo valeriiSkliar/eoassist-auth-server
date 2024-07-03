@@ -1,5 +1,6 @@
 import { loger } from "@/lib/console-loger";
 import { encrypt } from "@/lib/encript-session";
+import { generateApiKey } from "@/lib/generate-api-key";
 import { newUserCredintialsSchema, newUserRequestSchema } from "@/lib/schemas-zod";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,7 +21,8 @@ const notAllowed = async () => {
         }
         const url = createUrlWithSearchParams(searchParams.callbackUrl, encryptedUser);
         loger.info('url-start-session', url)
-        const response = NextResponse.redirect(url);
+        const response = NextResponse.json(url);
+        response.headers.set('Authrization', 'Bearer ' + generateApiKey());
 
         return response;
     } catch (error) {
