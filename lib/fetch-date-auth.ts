@@ -6,6 +6,7 @@
 // import { auth } from 'auth';
 import { URL } from 'url';
 
+import { Env } from './Env';
 import { loger } from './console-loger';
 import { generateApiKey } from './generate-api-key';
 
@@ -16,7 +17,7 @@ export const fetchDataAuth = async <T>(
   query: Record<string, string | number> = {},
 ): Promise<T> => {
   // try {
-  const url = new URL(`${process.env.API_SERVER_URL}/${path}`);
+  const url = new URL(`${Env.API_SERVER_URL}/${path}`);
   Object.keys(query).forEach((key) => {
     if (query[key] !== 'undefined' && typeof query[key] !== 'undefined') {
       url.searchParams.append(key, query[key] as string);

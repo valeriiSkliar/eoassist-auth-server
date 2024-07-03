@@ -3,7 +3,7 @@
 import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
 import { fetchDataAuth } from "@/lib/fetch-date-auth";
-import { redirect } from "next/navigation";
+import { redirectAction } from "./redirect-action";
 
 function getSubdomain(url: string): string  {
     // loger.info('url',url);
@@ -52,6 +52,9 @@ export const credentialsFormAction = async (
     const authResponse = await fetchDataAuth<{auth_key:string, domain:string, error: string | null}>('api/users/auth', 'POST', {email, password, headers:{
         Domain: getSubdomain(String(callbackUrl))
     }})
+      .catch((error) => {
+        loger.error('fetchDataAuth-error', error)
+      })
 
     const startSessionResponse = await fetch(urlStartSession.toString(), { method: 'POST', body: JSON.stringify({
       user:  {...authResponse, email:email.toString()}, 
@@ -61,7 +64,11 @@ export const credentialsFormAction = async (
       .then(res => res.json())
       .then(data => {
         loger.info('startSessionResponse', data)
-        redirect(data.url)
+        redirectAction(data.url)
+      })
+      .catch((error) => {
+        // TODO show error tost
+        loger.error('startSessionResponse- error', error)
       })
 
     loger.info('authResponse', authResponse)
