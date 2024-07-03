@@ -25,7 +25,7 @@ const storage = createStorage({
 const config = {
   pages: {
     signIn: "/",
-    newUser: '/auth/new-user' 
+    // newUser: '/auth/new-user' 
 },
   trustHost: true,
   theme: { logo: "https://authjs.dev/img/logo-sm.png" },
