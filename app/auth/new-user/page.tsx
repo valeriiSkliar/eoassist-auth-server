@@ -1,7 +1,9 @@
 import { auth } from "@/auth";
 import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
-import { redirect } from "next/navigation";
+import { generateApiKey } from "@/lib/generate-api-key";
+import { getSubdomain } from "@/middleware";
+import { permanentRedirect } from "next/navigation";
 
 const NewUserPage = async ({searchParams}: {searchParams: {callbackUrl?: string}}) => { 
     const session = await auth()
@@ -16,18 +18,23 @@ const NewUserPage = async ({searchParams}: {searchParams: {callbackUrl?: string}
             const response = await fetch(
                 urlStartSession.toString(), 
                 { 
-                        method: 'POST', body: JSON.stringify({
+                        method: 'POST', 
+                        headers: {
+                            Authorization: `Bearer ${generateApiKey()}`,
+                            Domain: getSubdomain(String(searchParams?.callbackUrl))
+                        },
+                        body: JSON.stringify({
                         user: session,
                         searchParams
                     })
                 })
                     .then(res => res.json()).then(data => {
 
-                        redirect(data.url)
+                        permanentRedirect(data.url)
 
                 })
                     .catch((error) => {
-                        loger.error('error-main-page', error)
+                        loger.error('error-new-user-page', error)
                     })
             }   
     return (

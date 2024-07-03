@@ -4,7 +4,7 @@ import { loger } from "@/lib/console-loger";
 import { generateApiKey } from "@/lib/generate-api-key";
 import { getSubdomain } from "@/middleware";
 import { auth } from "auth";
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 export default async function Index({searchParams}: {searchParams: {callbackUrl?: string}}) {
   const session = await auth()
@@ -25,7 +25,7 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
               callbackUrl: url.toString()
           }
       })}).then(res => res.json()).then(data => {
-          redirect(data.url)
+        permanentRedirect(data.url, )
   
       })
       .catch((error) => {
