@@ -3,14 +3,14 @@ import { encrypt } from "@/lib/encript-session";
 import { newUserCredintialsSchema, newUserRequestSchema } from "@/lib/schemas-zod";
 import { NextRequest, NextResponse } from "next/server";
 
-export const notAllowed = async () => {
+const notAllowed = async () => {
     return NextResponse.json({
         success: false,
         message: "Method not allowed"
     })
 }
 
- const POST = async (req: NextRequest) => {
+ export const POST = async (req: NextRequest) => {
     try {
         const body = await getRequestBody(req);
         const {user, searchParams} = checkBodyData(body);
@@ -31,7 +31,7 @@ export const notAllowed = async () => {
 
 
 
-export { notAllowed as DELETE, notAllowed as GET, notAllowed as HEAD, notAllowed as OPTIONS, notAllowed as PATCH, POST, notAllowed as PUT };
+export { notAllowed as DELETE, notAllowed as GET, notAllowed as HEAD, notAllowed as OPTIONS, notAllowed as PATCH, notAllowed as PUT };
 
 
 //   PRIVATE FUNCTIONS

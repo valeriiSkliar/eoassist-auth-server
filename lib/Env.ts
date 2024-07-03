@@ -1,6 +1,5 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
-import { getverifierForAuth } from './generateCode-for-yandex';
 
 // Don't add NODE_ENV into T3 Env, it changes the tree-shaking behavior
 export const Env = createEnv({
@@ -14,8 +13,6 @@ export const Env = createEnv({
     API_KEY: z.string().min(1),
     DOMAIN: z.string().min(1),
     NEXTAUTH_URL: z.string().min(1),
-    codeChallenge: z.string(),
-    codeVerifier: z.string()
   },
   client: {
     // AUTH_SECRET: z.string().min(1),
@@ -34,7 +31,5 @@ export const Env = createEnv({
     API_KEY: process.env.API_KEY,
     DOMAIN: process.env.DOMAIN,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    codeChallenge: getverifierForAuth()?.codeChallenge || '',
-    codeVerifier: getverifierForAuth()?.codeVerifier || ''
   },
 });

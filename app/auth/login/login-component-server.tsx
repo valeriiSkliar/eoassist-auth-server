@@ -1,10 +1,10 @@
 // 'use client'
 // import { signIn } from "next-auth/react"
 // import { useRouter, useSearchParams } from "next/navigation";
-
+// @ts-nocheck
 import { logInAction } from "./server-login";
 
-const LoginComponentServer = ({ searchParams}) => {
+const LoginComponentServer = ({ searchParams}: any) => {
     // loger.info('Credentials-LoginComponentServer', { searchParams})
 
     return (

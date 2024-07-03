@@ -2,12 +2,11 @@
 import { credentialsFormAction } from '@/actions/credintials-foms-action';
 import { useSearchParams } from 'next/navigation';
 import type { FC } from 'react';
+import { useFormState } from 'react-dom';
 import { MdAlternateEmail } from "react-icons/md";
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-// @ts-expect-error
-import { useFormState } from 'react-dom';
 
 interface LoginFormCredintialsProps  {
   className?: string;
