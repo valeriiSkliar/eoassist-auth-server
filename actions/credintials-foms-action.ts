@@ -11,6 +11,10 @@ function getSubdomain(url: string): string  {
       return '';
     }
     const urlObject = new URL(url);
+    const mainDomain = new URL(Env.DOMAIN)
+    if (urlObject.hostname === mainDomain.hostname) {
+      return '';
+    }
     const hostnameParts = urlObject.hostname.split('.');
   
     // Check for at least two parts (subdomain and domain)

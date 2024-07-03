@@ -9,7 +9,6 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
   const session = await auth()
   const head = headers()
   const urlStartSession = new URL('/api/start-session', Env.DOMAIN);
-  loger.info('urlStartSession', urlStartSession)
 
   if(session) {
     loger.info('session-main-page', session)
