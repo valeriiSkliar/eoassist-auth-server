@@ -19,7 +19,7 @@ const notAllowed = async () => {
           encryptedUser.provider = searchParams?.provider
         }
         const url = createUrlWithSearchParams(searchParams.callbackUrl, encryptedUser);
-        const response = NextResponse.json({ url: url });
+        const response = NextResponse.redirect(url);
         return response;
     } catch (error) {
         loger.error('error-start-session', error)

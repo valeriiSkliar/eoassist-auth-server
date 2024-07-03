@@ -1,4 +1,3 @@
-import { redirectAction } from "@/actions/redirect-action";
 import { auth } from "@/auth";
 import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
@@ -28,12 +27,14 @@ const NewUserPage = async ({searchParams}: {searchParams: {callbackUrl?: string}
                         searchParams
                     })
                 })
-                    .then(res => res.json()).then(data => {
+                //     .then(res => res.json()).then(data => {
 
-                        redirectAction(data.url)
+                //         redirectAction(data.url)
 
-                })
+                // })
                     .catch((error) => {
+        // TODO show error tost
+
                         loger.error('error-new-user-page', error)
                     })
             }   

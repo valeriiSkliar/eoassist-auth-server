@@ -1,4 +1,3 @@
-import { redirectAction } from "@/actions/redirect-action";
 import { SignInComponent } from "@/components/sign-in-component";
 import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
@@ -24,10 +23,12 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
           searchParams:{
               callbackUrl: url.toString()
           }
-      })}).then(res => res.json()).then(data => {
-        redirectAction(data.url)
-      })
+      })})
+      // .then(res => res.json()).then(data => {
+      //   redirectAction(data.url)
+      // })
       .catch((error) => {
+        // TODO show error tost
         loger.error('error-main-page', error)
       })
   }
