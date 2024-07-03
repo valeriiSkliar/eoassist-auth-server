@@ -23,7 +23,9 @@ export const authConfig: NextAuthConfig = {
         return session;
         },  
         async redirect({url, baseUrl}) {
-        const redirectUrl = new URL('/auth/authorization', url);
+        // const redirectUrl = new URL('/auth/authorization', url);
+        const redirectUrl = new URL(baseUrl);
+        redirectUrl.searchParams.set('callbackUrl', url);
         // loger.info('redirectUrl', redirectUrl)
         return redirectUrl.toString();
         },
