@@ -44,7 +44,7 @@ export const credentialsFormAction = async (
     if (String(password).length < 8) {
         return { error: 'Password must be at least 8 characters' };
     }
-
+    try {
     const authResponse = await fetchDataAuth<{auth_key:string, domain:string, error: string | null}>('api/users/auth', 'POST', {email, password, headers:{
         Domain: getSubdomain(String(callbackUrl))
     }})
@@ -61,6 +61,10 @@ export const credentialsFormAction = async (
       })
 
     loger.info('authResponse', authResponse)
+
+    } catch (error) {
+        loger.error('error', error)
+    }
 
     return {email, password};
 }
