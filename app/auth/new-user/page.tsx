@@ -1,9 +1,9 @@
+import { redirectAction } from "@/actions/redirect-action";
 import { auth } from "@/auth";
 import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
 import { generateApiKey } from "@/lib/generate-api-key";
 import { getSubdomain } from "@/middleware";
-import { permanentRedirect } from "next/navigation";
 
 const NewUserPage = async ({searchParams}: {searchParams: {callbackUrl?: string}}) => { 
     const session = await auth()
@@ -30,7 +30,7 @@ const NewUserPage = async ({searchParams}: {searchParams: {callbackUrl?: string}
                 })
                     .then(res => res.json()).then(data => {
 
-                        permanentRedirect(data.url)
+                        redirectAction(data.url)
 
                 })
                     .catch((error) => {

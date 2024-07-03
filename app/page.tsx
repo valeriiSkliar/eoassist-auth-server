@@ -1,10 +1,10 @@
+import { redirectAction } from "@/actions/redirect-action";
 import { SignInComponent } from "@/components/sign-in-component";
 import { Env } from "@/lib/Env";
 import { loger } from "@/lib/console-loger";
 import { generateApiKey } from "@/lib/generate-api-key";
 import { getSubdomain } from "@/middleware";
 import { auth } from "auth";
-import { permanentRedirect } from "next/navigation";
 
 export default async function Index({searchParams}: {searchParams: {callbackUrl?: string}}) {
   const session = await auth()
@@ -25,8 +25,7 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
               callbackUrl: url.toString()
           }
       })}).then(res => res.json()).then(data => {
-        permanentRedirect(data.url, )
-  
+        redirectAction(data.url)
       })
       .catch((error) => {
         loger.error('error-main-page', error)
