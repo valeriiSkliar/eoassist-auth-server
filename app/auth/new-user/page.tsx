@@ -1,13 +1,13 @@
 import { auth } from "@/auth";
-import { loger } from "@/lib/console-loger";
+import { Env } from "@/lib/Env";
 import { redirect } from "next/navigation";
 
 const NewUserPage = async ({searchParams}: {searchParams: {url?: string}}) => { 
     const session = await auth()
-    loger.info('user-new-user-page', session);
+    const url = new URL('/api/start-session', Env.DOMAIN);
 
     if (session) {
-    const response = await fetch("http://auth.eoassist.hu/api/start-session", { method: 'POST', body: JSON.stringify({
+    const response = await fetch(url.toString(), { method: 'POST', body: JSON.stringify({
         user: session,
         searchParams
     })}).then(res => res.json()).then(data => {
@@ -18,7 +18,8 @@ const NewUserPage = async ({searchParams}: {searchParams: {url?: string}}) => {
     }   
     return (
         <div className="space-y-2">
-            <section>
+            
+            {/* <section>
                 <h2 className="text-xl font-bold">New User</h2>
                 <p>
                 NewUserPage
@@ -26,7 +27,7 @@ const NewUserPage = async ({searchParams}: {searchParams: {url?: string}}) => {
                 <pre>
                     {JSON.stringify(session, null, 2)}
                 </pre>
-            </section>
+            </section> */}
         </div>
     )
 }

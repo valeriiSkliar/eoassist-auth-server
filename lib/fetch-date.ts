@@ -17,7 +17,7 @@ export const fetchData = async <T>(
   query: Record<string, string | number> = {},
 ): Promise<T> => {
   // try {
-  const url = new URL(`${'http://eoassist.hu'}/${path}`);
+  const url = new URL(`${Env.DOMAIN}/${path}`);
   Object.keys(query).forEach((key) => {
     if (query[key] !== 'undefined' && typeof query[key] !== 'undefined') {
       url.searchParams.append(key, query[key] as string);

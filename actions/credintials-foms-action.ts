@@ -30,6 +30,8 @@ export const credentialsFormAction = async (
     const password = formData.get('password') ?? '';
     const callbackUrl = formData.get('callbackUrl') ?? Env.DOMAIN;
     const url = new URL('/auth/authorization', callbackUrl.toString());
+    const urlStartSession = new URL('/api/start-session', Env.DOMAIN);
+
 
     if (!email || !password) {
         return { error: 'Email and password are required' };
@@ -47,7 +49,7 @@ export const credentialsFormAction = async (
         Domain: getSubdomain(String(callbackUrl))
     }})
 
-    const startSessionResponse = await fetch('http://auth.eoassist.hu/api/start-session', { method: 'POST', body: JSON.stringify({
+    const startSessionResponse = await fetch(urlStartSession.toString(), { method: 'POST', body: JSON.stringify({
       user:  {...authResponse, email:email.toString()}, 
       searchParams:{callbackUrl: url.toString(),  provider: 'credentials'},
       provider: 'credentials'

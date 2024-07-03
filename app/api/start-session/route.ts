@@ -52,28 +52,19 @@ const getRequestBody = async (req: NextRequest) => {
 
   const checkBodyData = (body: any) => {
     if (body?.provider) {
-      loger.info('body-credentials', body)
-      loger.info('body-provider', body.provider)
-
-      const credentials2 = newUserCredintialsSchema.parse(body);
-
       const credentials = newUserCredintialsSchema.safeParse(body);
       if (!credentials.success) {
         throw new Error("Invalid user data");
       }
-      loger.info('credentials', credentials.data)
       return credentials.data;
     }
     if (!body) {
       throw new Error("Missing user data");
     }
-    loger.info('body-oauth', body)
-    // const parsedBodyData2 = newUserRequestSchema.parse(body);
 
     const parsedBodyData = newUserRequestSchema.safeParse(body);
     if (!parsedBodyData.success) {
       throw new Error("Invalid user data");
     }
-    // loger.info('parsedBodyData', parsedBodyData.data)
     return parsedBodyData.data;
   }
