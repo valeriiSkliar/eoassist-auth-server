@@ -47,6 +47,7 @@ const googleUserSchema = z.object({
   const newUserRequestSchema = z.object({
     user: userSchema.nullable(),
     searchParams: z.object({
+      redirect: z.string().url(),
       callbackUrl: z.string().url(),
       provider: z.string().optional(),
     }),

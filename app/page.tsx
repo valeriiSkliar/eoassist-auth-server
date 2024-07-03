@@ -9,7 +9,7 @@ import { auth } from "auth";
 export default async function Index({searchParams}: {searchParams: {redirect?: string}}) {
   const session = await auth()
   const urlStartSession = new URL('/api/start-session', Env.NEXTAUTH_URL);
-
+  loger.info('searchParams', searchParams)
   if(session) {
     loger.info('session-main-page', session)
       const url = new URL('/auth/authorization',searchParams?.redirect ?? Env.DOMAIN);

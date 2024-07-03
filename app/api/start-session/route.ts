@@ -15,6 +15,7 @@ const notAllowed = async () => {
     try {
         const body = await getRequestBody(req);
         const {user, searchParams} = checkBodyData(body);
+        loger.info('user-start-session', user)
         const encryptedUser = encrypt(JSON.stringify(user));
         if (searchParams?.provider) {
           encryptedUser.provider = searchParams?.provider
