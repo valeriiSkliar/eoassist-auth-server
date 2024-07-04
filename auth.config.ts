@@ -22,10 +22,14 @@ export const authConfig: NextAuthConfig = {
         loger.info('session', {  session,  token })
         return session;
         },  
-        async redirect({url, baseUrl}) {
-        const redirectUrl = new URL('/auth/authorization', url);
-        return redirectUrl.toString();
-        },
+        // async redirect({url, baseUrl}) {
+        //   loger.info('redirect', {  url,  baseUrl })
+        //   const redirectUrl = new URL(baseUrl);
+        //   if ( baseUrl !== url && redirectUrl.searchParams.get("origin") === null) {
+        //     redirectUrl.searchParams.append("origin", url);
+        //   }
+        // return redirectUrl.toString();
+        // },
 
         async authorized({ request, auth }) {
 

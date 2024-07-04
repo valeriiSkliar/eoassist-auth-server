@@ -1,5 +1,6 @@
 import { auth } from "auth";
 import { NextResponse } from "next/server";
+import { Env } from "./lib/Env";
 import { generateApiKey } from "./lib/generate-api-key";
 
 export function getSubdomain(url: string): string  {
@@ -19,18 +20,19 @@ export function getSubdomain(url: string): string  {
 }
 
 
-export default auth(async (req) => {
-  req.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
+export default auth(async (request) => {
+
+  request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
   const response = NextResponse.next()
-  const regex = /(?<=\/\/)[^\.]+(?=\.)/;
-
-  const referer = req.headers.get('referer');
-  if (referer) {
-  const shortDomain = getSubdomain(referer ?? '');
-
-    response.headers.set('partnerDomain', shortDomain);
-    response.cookies.set('partnerDomain', shortDomain);
+  const refererFromRequest = request.headers.get('referer') ?? '';
+  if (refererFromRequest !== Env.NEXTAUTH_URL) {
+    const subdomain = getSubdomain(refererFromRequest);
+    request.headers.set('referal-domain', refererFromRequest ?? '');
+    request.cookies.set('referal-domain', refererFromRequest ?? '');
+    response.cookies.set('referal-domain', refererFromRequest ?? '');
+    response.headers.set('referal-domain', refererFromRequest ?? '');
   }
+  const regex = /(?<=\/\/)[^\.]+(?=\.)/;
 
   return response;
 
