@@ -32,7 +32,6 @@ export const authConfig: NextAuthConfig = {
         allowDangerousEmailAccountLinking: true,
         checks: ['pkce'],    
       async profile (profile) {
-           
         if (profile) {
           return {
               oauth_id: profile.sub,
