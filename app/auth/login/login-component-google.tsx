@@ -30,7 +30,6 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
           ...session.user
         }});
       window.close();
-
       } 
 
 
@@ -39,16 +38,13 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     return (
       <Button
           onClick={startLogin}
-          disabled={isPending}
           variant="outline" 
           className="w-full"
         >
-            {isPending ? 'Loading...' : (
               <>
                 <FaGoogle className="mr-2 h-5 w-5" />
                 Sign in with Google
               </>
-            )}
         </Button>
     )
 }
