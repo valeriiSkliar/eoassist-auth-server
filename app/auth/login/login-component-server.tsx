@@ -5,7 +5,6 @@
 import { logInAction } from "./server-login";
 
 const LoginComponentServer = ({ searchParams}: any) => {
-    // loger.info('Credentials-LoginComponentServer', { searchParams})
 
     return (
 <div>Login Page

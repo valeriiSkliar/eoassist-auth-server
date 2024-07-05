@@ -25,7 +25,7 @@ const LoginPage = async ({searchParams}: {searchParams: {callbackUrl?: string}})
     }
    
  
-    return      <LoginWithGoogle />
+    return      <LoginWithGoogle originHost={'head.get()'}/>
 }
 
 export default LoginPage

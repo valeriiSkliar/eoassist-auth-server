@@ -1,32 +1,31 @@
-import GetAuthKey from "@/components/auth/get-auth-key";
 import { SignInComponent } from "@/components/sign-in-component";
 import { Env } from "@/lib/Env";
-import { loger } from "@/lib/console-loger";
 import { auth } from "auth";
 import { headers } from "next/headers";
 
-export default async function Index({searchParams}: {searchParams: {callbackUrl?: string}}) {
+export default async function Index({searchParams: {originHost}}: {searchParams: {originHost: string}}) {
   const session = await auth()
   const head = headers().get('host') ?? ''
-  const referer = headers().get('referer') ?? ''
-  const referal = referer !== Env.NEXTAUTH_URL ? referer ?? '' : headers().get('referal-domain') ?? ''
+  // const referal = referer !== Env.NEXTAUTH_URL ? referer ?? '' : headers().get('referal-domain') ?? ''
   const urlStartSession = new URL('/api/start-session', Env.DOMAIN);
-  loger.info('referal', referal)
-  loger.info('referal - headers', headers().get('referal-domain'))
 
-  if(session) {
-    loger.info('session-main-page', session)
-      // const url = new URL('/auth/authorization',searchParams?.callbackUrl ?? '/');
-      // const response = await fetch(urlStartSession.toString(), { method: 'POST', body: JSON.stringify({
-      //     user: session,
-      //     searchParams:{
-      //         callbackUrl: url.toString()
-      //     }
-      // })}).then(res => res.json()).then(data => {
-      //     redirect(data.url)
-  
-      // })
-  }
+  // if(session && searchParams.originHost) {
+  //   const  url = new URL('/api/authorization',searchParams.originHost);
+  //   const response = fetch(url.toString(), {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       email: session?.user?.email,
+  //       name: session?.user?.name,
+  //       id: session?.user?.id,
+  //       image: session?.user?.image,
+  //       domain: referal
+  //     })
+  //   }).then(res => res.json()).then(data => {
+  //     loger.info('data', data)
+  //     return data;
+  //   })
+  // }
+
   return (
     <>
       
@@ -34,9 +33,10 @@ export default async function Index({searchParams}: {searchParams: {callbackUrl?
         session ? <pre>{JSON.stringify(session, null, 2)}</pre> : <pre>{JSON.stringify(head, null, 2)}</pre>
       } */}
       {/* <LoginComponentClient /> */}
-      <GetAuthKey host={head} referal={referer} />
+      {/* <pre>{JSON.stringify(headers().get('referal-domain'))}</pre> */}
+      {/* <GetAuthKey host={head} referal={originHost} /> */}
 
-      <SignInComponent/>
+      <SignInComponent originHost={originHost}/>
 
     </>
   )

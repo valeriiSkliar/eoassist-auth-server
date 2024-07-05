@@ -1,55 +1,40 @@
 'use client'
 import { loger } from '@/lib/console-loger';
 import { useSession } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, type FC } from 'react';
+import { useEffect, type FC } from 'react';
 
 interface GetAuthKeyProps  {
-  className?: string;
+  // className?: string;
   referal?: string;
   host?: string;
 }
 
-const GetAuthKey: FC<GetAuthKeyProps> = (props) => {
-  const { className='', ...otherProps } = props;
+const GetAuthKey: FC<GetAuthKeyProps> = ({referal}) => {
+  // const { className='', ...otherProps } = props;
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
-  const host = searchParams.get('origin')?.toString().slice(0, -1);
-  const [hostOrigin, setHostOrigin] = useState(host ?? '');
-loger.info('host', host)
+  // const searchParams = useSearchParams();
+  // const host = searchParams.get('origin')?.toString().slice(0, -1);
 
-  useEffect(() => {
-      const handleLoad = () => {
-        window.addEventListener('message', handleMessageFromHost, false);
-      };
-      window.addEventListener('load', handleLoad);
-
-    if(!sessionStorage.getItem('referer')  && props.host !== props.referal)  {
-      sessionStorage.setItem('referer', props.referal ?? '') ;
-    }
-    const handleMessageFromHost = (event: MessageEvent) => {
-      console.log('GetAuthKey', event.data);
-    };
-    return () => {
-      window.removeEventListener('message', handleMessageFromHost);
-      window.removeEventListener('load', handleLoad);
-      // sessionStorage.removeItem('referer')
-      sessionStorage.clear();
-    };
-  }, []);
   const sendMessage = () => {
-    if (window.opener) {
-      loger.info('opener', {host ,hostOrigin})
-      const targetOrigin = sessionStorage.getItem('referer');
-      window.opener.postMessage('Hello, from Popup', targetOrigin);
+    loger.info('opener', {referal})
+
+    if (window?.opener) {
+      window.opener.postMessage('Hello, from Popup', referal);
     }
   };
+  useEffect(() => {
+    if(session) {
+      loger.info('session', session)
+      sendMessage()
+    }
+
+  }, [session]);
+
 
   return (
-    <div className={`${className}`} {...otherProps}>
+    <div >
       <h1>GetAuthKey</h1>
       {session && <pre>{JSON.stringify(session, null, 2)}</pre>}
-      {hostOrigin && <pre>{hostOrigin}</pre>}
       <button type="button" onClick={sendMessage}>
         send message
       </button>

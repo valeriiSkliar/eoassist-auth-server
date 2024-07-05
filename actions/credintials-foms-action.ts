@@ -6,7 +6,6 @@ import { fetchDataAuth } from "@/lib/fetch-date-auth";
 import { redirect } from "next/navigation";
 
 function getSubdomain(url: string): string  {
-    // loger.info('url',url);
     if (!url) {
       return '';
     }
@@ -56,7 +55,6 @@ export const credentialsFormAction = async (
     })})
       .then(res => res.json())
       .then(data => {
-        loger.info('startSessionResponse', data)
         redirect(data.url)
       })
 

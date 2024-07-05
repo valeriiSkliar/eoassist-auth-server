@@ -1,40 +1,38 @@
-// @ts-nocheck
 import type { NextAuthConfig } from 'next-auth';
 import Google from "next-auth/providers/google";
 import Yandex from "next-auth/providers/yandex";
+import { headers } from 'next/headers';
+import { signInGoogle } from './actions/google-login-action';
 import { Env } from "./lib/Env";
 import { loger } from "./lib/console-loger";
 
 export const authConfig: NextAuthConfig = {
     callbacks: {
-        // async signIn({ user, account, profile, email, credentials }) {
-        //   // loger.info('signIn', { user, account })
-        //   // if (account?.provider === "yandex") {
-        //   //   loger.info('signIn-yandex', { user, account })
-        //   //   return true
-        //   // }
-        //   return true
-        // },
+        async signIn({ user, account, profile, email, credentials }) {
+
+            // loger.info('signIn', {user, account, profile, email, credentials})
+          return true
+        },
+        async redirect({ url, baseUrl }) {
+            const origin = new URL(url)
+            if( origin.searchParams.has('originHost')) return origin.toString();
+            loger.info('redirect', {url, baseUrl})
+            if(url.startsWith(baseUrl)) return baseUrl;
+            const baseWithOriginHost = new URL(baseUrl);
+            baseWithOriginHost.searchParams.set('originHost', url)            
+            return baseWithOriginHost.toString();
+        },
         async jwt({token, user, account, profile}) {
             return token;
         },
         async session({session, token,}) {
-        loger.info('session', {  session,  token })
         return session;
-        },  
-        // async redirect({url, baseUrl}) {
-        //   loger.info('redirect', {  url,  baseUrl })
-        //   const redirectUrl = new URL(baseUrl);
-        //   if ( baseUrl !== url && redirectUrl.searchParams.get("origin") === null) {
-        //     redirectUrl.searchParams.append("origin", url);
-        //   }
-        // return redirectUrl.toString();
-        // },
-
+        }, 
         async authorized({ request, auth }) {
+          loger.info('authorized', {auth})
 
-        const { pathname } = request.nextUrl
-        if (pathname === "/middleware-example") return !!auth
+        // const { pathname } = request.nextUrl
+        // if (pathname === "/middleware-example") return !!auth
         return true
         },
     },
@@ -48,17 +46,38 @@ export const authConfig: NextAuthConfig = {
         allowDangerousEmailAccountLinking: true,
         checks: ['pkce'],    
       async profile (profile) {
+           
         if (profile) {
+        //   const userData = await fetchDataAuth<{ auth_key: string; domain: string }>(`api/users/oauth`, 'POST', {
+        //     oauth_id: profile?.sub,
+        //     email: profile?.email,
+        //     headers: {
+        //         Domain: getSubdomain(refererCookie),
+        //     }
+        // })
           return {
-            // user: {
               oauth_id: profile.sub,
               name: profile.name,
               email: profile.email,
-              image: profile.picture
-            // }
+              image: profile.picture,
+              // auth_key: userData?.auth_key,
+              // domain: userData?.domain,
+              ok: false,
+              provider: 'google',
+              success: "Successfully logged in",
           }
         }
-        return profile;
+        return {
+          oauth_id: null,
+          name: null,
+          email: null,
+          image: null,
+          auth_key: null,
+          domain:  null,
+          ok: true,
+          provider: 'google',
+          success: "Failed logged in",
+        };
       }
     }),
     Yandex({
@@ -68,16 +87,27 @@ export const authConfig: NextAuthConfig = {
       checks: ['pkce'],
 
       async profile (profile) {
-        loger.info('profile', { profile })
+        const referer = headers().get('referer')?.toString() ?? ''
+         
         if (profile) {
+        loger.info('profile-referer', referer)
+        loger.info('profile', profile)
+
+
+          const userData = await signInGoogle(
+            {
+              oauth_id: profile.id ?? profile.client_id,
+              email: profile.default_email,
+            },
+             referer
+            );
           return {
-            // user: {
               oauth_id: profile.id ?? profile.client_id,
               name: profile.real_name,
               email: profile.default_email,
-              image: profile.is_avatar_empty ? null : `https://avatars.yandex.net/get-yapic/${profile.default_avatar_id}/islands-200`
-            // }
-          }
+              image: profile.is_avatar_empty ? null : `https://avatars.yandex.net/get-yapic/${profile.default_avatar_id}/islands-200`,
+              auth_key: userData?.auth_key, 
+              domain: userData?.domain,}
         }
         return profile;
       },

@@ -23,16 +23,33 @@ export function getSubdomain(url: string): string  {
 
 export default auth(async (request) => {
   loger.info('request', request.nextUrl)
+
+  
   request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
   const response = NextResponse.next()
   const refererFromRequest = request.headers.get('referer') ?? '';
-  if (refererFromRequest !== Env.NEXTAUTH_URL) {
-    const subdomain = getSubdomain(refererFromRequest);
-    request.headers.set('referal-domain', refererFromRequest ?? '');
-    request.cookies.set('referal-domain', refererFromRequest ?? '');
-    response.cookies.set('referal-domain', refererFromRequest ?? '');
-    response.headers.set('referal-domain', refererFromRequest ?? '');
+
+
+
+  const subdomain = getSubdomain(refererFromRequest);
+  request.headers.set('referal-domain', refererFromRequest ?? '');
+  request.cookies.set('referal-domain', refererFromRequest ?? '');
+  response.cookies.set('referal-domain', refererFromRequest ?? '');
+  response.headers.set('referal-domain', refererFromRequest ?? '');
+
+
+
+  const referalDomain = request.cookies.get('referal-domain')?.value ?? '';
+  if (!referalDomain) {
+    if (!refererFromRequest.startsWith(Env.NEXTAUTH_URL)) {
+      const subdomain = getSubdomain(refererFromRequest);
+      request.headers.set('referal-domain', refererFromRequest ?? '');
+      request.cookies.set('referal-domain', refererFromRequest ?? '');
+      response.cookies.set('referal-domain', refererFromRequest ?? '');
+      response.headers.set('referal-domain', refererFromRequest ?? '');
+    }
   }
+
   const regex = /(?<=\/\/)[^\.]+(?=\.)/;
 
 

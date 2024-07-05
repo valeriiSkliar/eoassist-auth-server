@@ -4,7 +4,7 @@ import { LoginWithYandex } from "@/app/auth/login/login-component-yandex"
 import LoginFormCredintials from "./loginFormCredintials"
 
 export function 
-SignInComponent() {
+SignInComponent({originHost}: {originHost: string}) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md space-y-8">
@@ -14,7 +14,9 @@ SignInComponent() {
           <p className="text-muted-foreground">Welcome back! Please enter your details to continue.</p>
         </div>
         <div className="space-y-6">
-          <LoginWithGoogle /> 
+          <LoginWithGoogle originHost={originHost} /> 
+          {/* <SignInComponentServer />  */}
+
           <LoginWithYandex /> 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
