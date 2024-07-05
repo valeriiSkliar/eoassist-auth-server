@@ -34,6 +34,18 @@ export default auth(async (request) => {
   }
   const regex = /(?<=\/\/)[^\.]+(?=\.)/;
 
+
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      headers: response.headers,
+      status: 204,
+    });
+  }
+
   return response;
 
 })
