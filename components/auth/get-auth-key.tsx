@@ -17,17 +17,6 @@ const GetAuthKey: FC<GetAuthKeyProps> = (props) => {
   const host = searchParams.get('origin')?.toString().slice(0, -1);
   const [hostOrigin, setHostOrigin] = useState(host ?? '');
 loger.info('host', host)
-  const getAuthKeyForBackend = async () => {
-    const response = await fetch('/api/get-auth-key', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({}),
-    });
-    const data = await response.json();
-    return data;
-  };
 
   useEffect(() => {
       const handleLoad = () => {

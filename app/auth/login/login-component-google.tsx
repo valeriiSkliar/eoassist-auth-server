@@ -3,13 +3,12 @@ import { signInGoogle } from "@/actions/google-login-action";
 import { Button } from "@/components/ui/button";
 import { loger } from "@/lib/console-loger";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 
 export const LoginWithGoogle = () => {
     const serchparams = useSearchParams()
-    const router = useRouter()
     const [refeterLink, setRefeterLink] = useState('')
     const callbackUrl = serchparams.get('otimizer')
     const {data : session} = useSession()
@@ -26,6 +25,13 @@ export const LoginWithGoogle = () => {
       }
     }
 
+    const startLogin = async () => {
+      await signIn("google", { callbackUrl: callbackUrl ?? '' })
+      // if(window.opener && window?.opener?.postMessage && refeterLink) {
+        const referer = sessionStorage.getItem('referer');
+        sendMessage({action: 'startLogin', key: 'google', value: referer});
+      // }
+    };
     useEffect(() => {
       if(session && window?.opener?.postMessage) {
         const referer = sessionStorage.getItem('referer');
@@ -56,13 +62,7 @@ export const LoginWithGoogle = () => {
     
     return (
       <Button
-          onClick={ async () => {
-            if(window.opener && window?.opener?.postMessage && refeterLink) {
-              window?.opener?.postMessage({action: 'start login'}, refeterLink);
-            }
-            await signIn("google", { callbackUrl: callbackUrl ?? '' })
-            sendMessage({action: 'startLogin', key: 'google', value: refeterLink});
-          }}
+          onClick={startLogin}
             variant="outline" className="w-full">
          <FaGoogle className="mr-2 h-5 w-5" />
             Sign in with Google

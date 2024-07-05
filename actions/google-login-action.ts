@@ -24,11 +24,16 @@ export async function signInGoogle(credentials: any, referer: string) {
                 domain: userData?.domain,
             },
             ok: true,
+            originHost: referer,
+            provider: 'google',
             success: "Successfully logged in",
         }
     } catch (error) {
         loger.error('error - google', error)
         return {
+            user: null,
+            originHost: referer,
+            provider: 'google',
             error: true,
             ok: false,
             success: false,
