@@ -1,6 +1,5 @@
 import { auth } from "auth";
 import { NextResponse } from "next/server";
-import { loger } from "./lib/console-loger";
 import { Env } from "./lib/Env";
 import { generateApiKey } from "./lib/generate-api-key";
 
@@ -22,7 +21,6 @@ export function getSubdomain(url: string): string  {
 
 
 export default auth(async (request) => {
-  loger.info('request', request.nextUrl)
 
   
   request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);

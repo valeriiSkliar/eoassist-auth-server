@@ -17,7 +17,7 @@ SignInComponent({originHost}: {originHost: string}) {
           <LoginWithGoogle originHost={originHost} /> 
           {/* <SignInComponentServer />  */}
 
-          <LoginWithYandex /> 
+          <LoginWithYandex originHost={originHost} /> 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
