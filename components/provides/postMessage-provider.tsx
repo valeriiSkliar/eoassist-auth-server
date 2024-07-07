@@ -5,20 +5,20 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 
 type FormDataType = {
-    values: {
+    // values: {
         email: string;
         password:  string;
-    },
+    // },
     error: string | undefined | null;
     callbackUrl: string;
 }
 
 type MessageDataType = {action: string; key: string; value: any};
 const initialState = {
-    values: {
+    // values: {
         email: '',
-        password: ''
-    },
+        password: '',
+    // },
     error: null,
     callbackUrl: ''
 }
@@ -64,19 +64,19 @@ interface PostMessagesContextType {
     const credintialsFormSubminHendler = async (form: HTMLFormElement) => {
         const formData = new FormData(form);
         setFormState({
-            values: {
+            // values: {
                 email: formData.get('email')?.toString() ?? '',
-                password: formData.get('password')?.toString() ?? ''
-            },
+                password: formData.get('password')?.toString() ?? '',
+            // },
             error: null,
             callbackUrl: formData.get('callbackUrl')?.toString() ?? ''
         })
         // setError('something went wrong')
         sendMessageHandler({action: 'startLogin', key: 'credintials', value: {
-            values: {
+            // values: {
                 email: formData.get('email')?.toString() ?? '',
-                password: formData.get('password')?.toString() ?? ''
-            },
+                password: formData.get('password')?.toString() ?? '',
+            // },
             error: null,
             callbackUrl: formData.get('callbackUrl')?.toString() ?? ''
         }})
