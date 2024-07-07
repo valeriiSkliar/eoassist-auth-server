@@ -1,3 +1,4 @@
+import { AdaptiveSpiner } from "@/components/adaptive-spiner";
 import { SignInComponent } from "@/components/sign-in-component";
 import { Env } from "@/lib/Env";
 import { auth } from "auth";
@@ -10,6 +11,8 @@ export default async function Index({searchParams: {originHost}}: {searchParams:
 
   return (
     <>
+      {/* <PostMessagesListener/> */}
+      <AdaptiveSpiner />
       <SignInComponent originHost={originHost}/>
     </>
   )
