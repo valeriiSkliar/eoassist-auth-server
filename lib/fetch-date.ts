@@ -7,6 +7,7 @@ import { auth } from 'auth';
 import { cookies, headers } from 'next/headers';
 import { URL } from 'url';
 
+import { loger } from './console-loger';
 import { Env } from './Env';
 import { generateApiKey } from './generate-api-key';
 
@@ -17,7 +18,7 @@ export const fetchData = async <T>(
   query: Record<string, string | number> = {},
 ): Promise<T> => {
   // try {
-  const url = new URL(`${Env.DOMAIN}/${path}`);
+  const url = new URL(`${Env.API_SERVER_URL}/${path}`);
   Object.keys(query).forEach((key) => {
     if (query[key] !== 'undefined' && typeof query[key] !== 'undefined') {
       url.searchParams.append(key, query[key] as string);
@@ -33,9 +34,13 @@ export const fetchData = async <T>(
     headers: {
       ...options.headers,
       'Auth-Key': user?.auth_key || '',
-      Authorization: cookiesFromRequest || generateApiKey(),
+      Authorization: `Bearer ${generateApiKey()}`,
       'Content-Type': 'application/json',
-      Domain: domainValue || '',
+      ...(options.headers.Domain ? 
+        {Domain: options.headers.Domain,}
+
+        : {Domain:  '',}
+      )
     },
     ...(options.method !== 'GET' && options.method !== 'HEAD' && { body: JSON.stringify(options.body) }),
 
@@ -52,18 +57,18 @@ export const fetchData = async <T>(
 
   fetchOptions.next = 0;
   fetchOptions.cache = 'no-store'; // TODO: remove this line after testing
-  // loger.info('url', url.toString());
-  // loger.info('fetchOptions', fetchOptions);
+  loger.info('url', url.toString());
+  loger.info('fetchOptions', fetchOptions);
 
   const response = await fetch(url.toString(), fetchOptions);
   if (!response.ok) {
-    // const errorText = await response.text();
-    // loger.error('Fetch error', {
-    //   url: url.toString(),
-    //   status: response.status,
-    //   statusText: response.statusText,
-    //   errorText,
-    // });
+    const errorText = await response.text();
+    loger.error('Fetch error', {
+      url: url.toString(),
+      status: response.status,
+      statusText: response.statusText,
+      errorText,
+    });
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 

@@ -1,5 +1,6 @@
 
 import { LoginWithGoogle } from "@/app/auth/login/login-component-google"
+import { LoginWithTelegram } from "@/app/auth/login/login-component-telegram"
 import { LoginWithYandex } from "@/app/auth/login/login-component-yandex"
 import LoginFormCredintials from "./loginFormCredintials"
 
@@ -18,6 +19,8 @@ SignInComponent({originHost}: {originHost: string}) {
           {/* <SignInComponentServer />  */}
 
           <LoginWithYandex originHost={originHost} /> 
+
+          <LoginWithTelegram originHost={originHost} />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
