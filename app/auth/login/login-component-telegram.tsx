@@ -18,7 +18,8 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
       }
     }, [originHost])
 
-    const startLogin = async () => {
+    const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
       if (!originHost) {
         sendMessage({action: 'error', key: 'originHost', value: {
           message: 'originHost is not defined'
@@ -30,7 +31,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
     //   })
     const telegramLinkResponse = await fetch(`/api/get-telegram-auth-link?origin=${originHost ?? ''}`)
         .then(res => res.json())
-        loger.info('telegramLinkResponse',telegramLinkResponse)
+        // loger.info('telegramLinkResponse',telegramLinkResponse)
         if (telegramLinkResponse.success) {
         setTelegramLink(telegramLinkResponse.data)
         }

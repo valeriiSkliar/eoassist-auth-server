@@ -15,7 +15,8 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
       }
     }, [originHost])
 
-    const startLogin = async () => {
+    const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
       sendMessage({action: 'startLogin', key: 'yandex', value: originHost});
       const response = await signIn("yandex", {
         redirectTo: originHost,

@@ -1,5 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
+import Fonts from "@/lib/fonts/font-cache";
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useTransition } from "react";
@@ -17,13 +18,15 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
       }
     }, [originHost]);
 
-    const startLogin = async () => {
+    const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+       startTransition(async () => {
         sendMessage({action: 'startLogin', key: 'google', value: originHost});
         const response = await signIn("google", {
           redirectTo: originHost,
         })
 
-    };
+    })}
     useEffect(() => {
       if(session && window?.opener) {
         sendMessage({ action: 'login', key: 'google', value: {
@@ -39,7 +42,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
       <Button
           onClick={startLogin}
           variant="outline" 
-          className="w-full"
+          className={`w-full text-fourth ${Fonts.raleway}`}
         >
               <>
                 <FaGoogle className="mr-2 h-5 w-5" />

@@ -17,6 +17,30 @@ module.exports = {
     },
     extend: {
       colors: {
+        first: {
+          DEFAULT: "#F5F5F5",
+          80: "rgba(245, 245, 245, 0.8)",
+          50: "rgba(245, 245, 245, 0.5)",
+          30: "rgba(245, 245, 245, 0.3)",
+        },
+        second: {
+          DEFAULT: "#BD8BCA",
+          80: "rgba(189, 139, 202, 0.8)",
+          50: "rgba(189, 139, 202, 0.5)",
+          30: "rgba(189, 139, 202, 0.3)",
+        },
+        third: {
+          DEFAULT: "#9E56B2",
+          80: "rgba(158, 86, 178, 0.8)",
+          50: "rgba(158, 86, 178, 0.5)",
+          30: "rgba(158, 86, 178, 0.3)",
+        },
+        fourth: {
+          DEFAULT: "#495563",
+          80: "rgba(73, 85, 99, 0.8)",
+          50: "rgba(73, 85, 99, 0.5)",
+          30: "rgba(73, 85, 99, 0.3)",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

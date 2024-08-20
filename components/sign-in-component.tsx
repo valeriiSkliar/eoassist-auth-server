@@ -1,8 +1,9 @@
 
-import { LoginWithGoogle } from "@/app/auth/login/login-component-google"
-import { LoginWithTelegram } from "@/app/auth/login/login-component-telegram"
-import { LoginWithYandex } from "@/app/auth/login/login-component-yandex"
-import LoginFormCredintials from "./loginFormCredintials"
+import { LoginWithGoogle } from "@/app/auth/login/login-component-google";
+import { LoginWithTelegram } from "@/app/auth/login/login-component-telegram";
+import { LoginWithYandex } from "@/app/auth/login/login-component-yandex";
+import Fonts from '@/lib/fonts/font-cache';
+import LoginFormCredintials from "./loginFormCredintials";
 
 export function 
 SignInComponent({originHost}: {originHost: string}) {
@@ -10,9 +11,9 @@ SignInComponent({originHost}: {originHost: string}) {
     <div className="flex min-h-full flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md space-y-8">
         <div className="space-y-4 text-center">
-          <LockIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h2 className="text-3xl font-bold tracking-tight">Sign in to your account</h2>
-          <p className="text-muted-foreground">Welcome back! Please enter your details to continue.</p>
+          <LockIcon className="mx-auto h-12 w-12 text-muted-foreground text-third" />
+          <h2 className={`text-3xl font-bold tracking-tight text-fourth ${Fonts.raleway.className}`}>Sign in to your account</h2>
+          <p className={`text-muted-foreground text-fourth ${Fonts.raleway.className}`}>Welcome back! Please enter your details to continue.</p>
         </div>
         <div className="space-y-6">
           <LoginWithGoogle originHost={originHost} /> 
@@ -26,7 +27,7 @@ SignInComponent({originHost}: {originHost: string}) {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className={`bg-background px-2 text-muted-foreground text-fourth ${Fonts.raleway.className}`}>Or continue with</span>
             </div>
           </div>
           <LoginFormCredintials originHost={originHost}/>
