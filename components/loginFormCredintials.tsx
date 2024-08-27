@@ -36,12 +36,13 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({className, originH
       <Input disabled={isLoading} id="password" type="password" name='password' placeholder="Enter your password" />
     </div>
     <input type="hidden" name="callbackUrl" value={originHost} />
-    <Button onClick={(e) => {
+    <Button 
+     onClick={(e) => {
       e.preventDefault();
       if (formRef.current) {
         handleSubmit(formRef.current)
       }
-    }} disabled={isLoading} type="submit" className="w-full bg-third">
+    }} disabled={isLoading} type="button" className="w-full bg-third">
     <MdAlternateEmail className="mr-2 h-5 w-5" />
       Sign in
     </Button>

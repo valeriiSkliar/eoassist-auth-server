@@ -4,6 +4,12 @@ import Yandex from "next-auth/providers/yandex";
 import { Env } from "./lib/Env";
 import { loger } from "./lib/console-loger";
 
+declare module 'next-auth' {
+  interface Session {
+    provider: string;
+  }
+}
+
 export const authConfig: NextAuthConfig = {
     callbacks: {
         async redirect({ url, baseUrl }) {
@@ -19,7 +25,7 @@ export const authConfig: NextAuthConfig = {
             return token;
         },
         async session({session, token,}) {
-        return session;
+        return session
         }, 
     },
     experimental: {
@@ -83,7 +89,7 @@ export const authConfig: NextAuthConfig = {
           auth_key: null,
           domain:  null,
           ok: true,
-          provider: 'google',
+          provider: 'yandex',
           success: "Failed logged in",
         };;
       },

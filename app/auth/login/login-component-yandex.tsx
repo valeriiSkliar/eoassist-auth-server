@@ -1,13 +1,21 @@
 'use client'
 import { Button } from "@/components/ui/button";
+import { loger } from "@/lib/console-loger";
 import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useTransition } from "react";
 import { FaYandex } from 'react-icons/fa';
+declare module 'next-auth' {
+  interface User {
+    provider?: string;
+    // Add other properties as needed
+  }
+}
 export const LoginWithYandex = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
     const {data : session} = useSession()
+
 
     const sendMessage = useCallback((message: {action: string; key: string; value: any}) => {
       if (window?.opener) {
@@ -24,7 +32,9 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
 
   };
   useEffect(() => {
-    if(session && window?.opener) {
+    loger.info('login with yandex', session)
+    if(session && session?.user?.provider == 'yandex' && window?.opener) {
+      loger.info('login with yandex', 'useEffect')
       sendMessage({ action: 'login', key: 'yandex', value: {
         ...session.user
       }});
@@ -35,6 +45,7 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
   }, [session])
     return (
         <Button
+          type="button"
           onClick={startLogin}
           variant="outline" 
           className="w-full"

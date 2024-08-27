@@ -56,6 +56,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
   }, [session, telegramLink])
     return (
         <Button
+          type="button"
           onClick={startLogin}
           variant="outline" 
           className="w-full"

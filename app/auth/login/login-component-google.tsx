@@ -5,7 +5,12 @@ import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useTransition } from "react";
 import { FaGoogle } from "react-icons/fa";
-
+declare module 'next-auth' {
+  interface User {
+    provider?: string;
+    // Add other properties as needed
+  }
+}
 export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
@@ -28,7 +33,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
 
     })}
     useEffect(() => {
-      if(session && window?.opener) {
+      if(session && session?.user?.provider == 'google'  && window?.opener) {
         sendMessage({ action: 'login', key: 'google', value: {
           ...session.user
         }});
@@ -40,7 +45,8 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     
     return (
       <Button
-          onClick={startLogin}
+          type="button"
+          // onClick={startLogin}
           variant="outline" 
           className={`w-full text-fourth ${Fonts.raleway}`}
         >

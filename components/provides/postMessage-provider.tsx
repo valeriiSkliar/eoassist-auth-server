@@ -72,7 +72,7 @@ interface PostMessagesContextType {
             callbackUrl: formData.get('callbackUrl')?.toString() ?? ''
         })
         // setError('something went wrong')
-        sendMessageHandler({action: 'startLogin', key: 'credintials', value: {
+        sendMessageHandler({action: 'login', key: 'credintials', value: {
             // values: {
                 email: formData.get('email')?.toString() ?? '',
                 password: formData.get('password')?.toString() ?? '',
