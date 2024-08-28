@@ -46,7 +46,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     return (
       <Button
           type="button"
-          // onClick={startLogin}
+          onClick={startLogin}
           variant="outline" 
           className={`w-full text-fourth ${Fonts.raleway}`}
         >
