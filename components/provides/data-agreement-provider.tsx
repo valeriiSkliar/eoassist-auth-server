@@ -43,7 +43,7 @@ export const AgreementCheckbox: React.FC = () => {
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-fourth"
       >
         I agree to the processing of personal data and have read the{' '}
-        <Link href="/privacy-policy" className="text-blue-500 hover:underline">
+        <Link target='_blank' href="https://eoassist.com/privacy-policy" className="text-blue-500 hover:underline">
           Privacy Policy
         </Link>
       </label>
