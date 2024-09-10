@@ -1,4 +1,5 @@
 'use client'
+import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { Button } from "@/components/ui/button";
 import { loger } from "@/lib/console-loger";
 import { useSession } from "next-auth/react";
@@ -17,6 +18,8 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
         window?.opener?.postMessage(message, originHost);
       }
     }, [originHost])
+    const { isAgreed } = useDataAgreement();
+
 
     const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
@@ -56,6 +59,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
   }, [session, telegramLink])
     return (
         <Button
+          disabled={isPending || !isAgreed}
           type="button"
           onClick={startLogin}
           variant="outline" 

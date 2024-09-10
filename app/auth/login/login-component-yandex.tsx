@@ -1,4 +1,5 @@
 'use client'
+import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { Button } from "@/components/ui/button";
 import { loger } from "@/lib/console-loger";
 import { signIn, useSession } from "next-auth/react";
@@ -15,6 +16,8 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
     const {data : session} = useSession()
+    const { isAgreed } = useDataAgreement();
+
 
 
     const sendMessage = useCallback((message: {action: string; key: string; value: any}) => {
@@ -44,6 +47,7 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
   }, [session])
     return (
         <Button
+          disabled={isPending || !isAgreed}
           type="button"
           onClick={startLogin}
           variant="outline" 

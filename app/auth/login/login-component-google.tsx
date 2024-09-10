@@ -1,4 +1,5 @@
 'use client'
+import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
 import { signIn, useSession } from "next-auth/react";
@@ -14,6 +15,8 @@ declare module 'next-auth' {
 export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
+      const { isAgreed } = useDataAgreement();
+
 
     const {data : session} = useSession()
 
@@ -46,6 +49,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     return (
       <Button
           type="button"
+          disabled={!isAgreed}
           onClick={startLogin}
           variant="outline" 
           className={`w-full text-fourth ${Fonts.raleway}`}
