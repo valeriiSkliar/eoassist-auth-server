@@ -24,9 +24,11 @@ const initialState = {
 }
 interface PostMessagesContextType {
     isLoading: boolean;
+    isLogInSuccess: boolean
     originHost: string | null
     formState: FormDataType;
     error: string | null;
+    setLogInSuccessHandler:(state: boolean) => void;
     sendMessage: (message: MessageDataType) => void
     setIsLoading: (value: boolean) => void;
     handleSubmit: (form: HTMLFormElement) => Promise<void>
@@ -53,6 +55,11 @@ interface PostMessagesContextType {
     const [isLoading, setIsLoading] = useState(false);
     const [close, setClose] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isLogInSuccess, setIsLogInSuccess] = useState(false);
+
+    const setLogInSuccessHandler = (state: boolean) => {
+        setIsLogInSuccess(state);
+    }
  
 
     const sendMessageHandler = useCallback((message: MessageDataType) => {
@@ -135,6 +142,8 @@ interface PostMessagesContextType {
             originHost,
             formState,
             error,
+            isLogInSuccess,
+            setLogInSuccessHandler,
             sendMessage: sendMessageHandler,
             setIsLoading: setIsLoadingHendler,
             handleSubmit: credintialsFormSubminHendler,

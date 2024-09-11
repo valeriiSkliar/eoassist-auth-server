@@ -21,6 +21,8 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
 
 
     const {data : session} = useSession()
+    // loger.info('login with google', session)
+
 
     const sendMessage = useCallback((message: {action: string; key: string; value: any}) => {
       if (window?.opener) {
@@ -39,8 +41,9 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     })}
     useEffect(() => {
       if(session 
-        // && session?.user?.provider == 'google' 
+        && session?.user?.provider == 'google' 
         && window?.opener) {
+          
         sendMessage({ action: 'login', key: 'google', value: {
           ...session.user
         }});

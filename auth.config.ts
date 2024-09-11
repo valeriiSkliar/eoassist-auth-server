@@ -2,7 +2,6 @@ import type { NextAuthConfig } from 'next-auth';
 import Google from "next-auth/providers/google";
 import Yandex from "next-auth/providers/yandex";
 import { Env } from "./lib/Env";
-import { loger } from "./lib/console-loger";
 
 declare module 'next-auth' {
   interface Session {
@@ -15,7 +14,7 @@ export const authConfig: NextAuthConfig = {
         async redirect({ url, baseUrl }) {
             const origin = new URL(url)
             if( origin.searchParams.has('originHost')) return origin.toString();
-            loger.info('redirect', {url, baseUrl})
+            // loger.info('redirect', {url, baseUrl})
             if(url.startsWith(baseUrl)) return baseUrl;
             const baseWithOriginHost = new URL(baseUrl);
             baseWithOriginHost.searchParams.set('originHost', url)            
