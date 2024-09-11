@@ -7,12 +7,12 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useTransition } from "react";
 import { FaYandex } from 'react-icons/fa';
-declare module 'next-auth' {
-  interface User {
-    provider?: string;
-    // Add other properties as needed
-  }
-}
+// declare module 'next-auth' {
+//   interface User {
+//     provider: string;
+//     // Add other properties as needed
+//   }
+// }
 export const LoginWithYandex = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
@@ -38,7 +38,11 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
   };
   useEffect(() => {
     loger.info('login with yandex', session)
-    if(session && session?.user?.provider == 'yandex' && window?.opener) {
+    const user = session?.user ?? {};
+    // const provider = Object.hasOwn(user, 'provider') ? user.provider : 'yandex';
+    if(session 
+        // && session?.user?.provider == 'yandex' 
+        && window?.opener) {
       sendMessage({ action: 'login', key: 'yandex', value: {
         ...session.user
       }});

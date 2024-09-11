@@ -38,7 +38,9 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
 
     })}
     useEffect(() => {
-      if(session && session?.user?.provider == 'google'  && window?.opener) {
+      if(session 
+        // && session?.user?.provider == 'google' 
+        && window?.opener) {
         sendMessage({ action: 'login', key: 'google', value: {
           ...session.user
         }});
