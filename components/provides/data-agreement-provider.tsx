@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import React, { createContext, useContext, useState } from 'react';
 import { Checkbox } from '../ui/checkbox';
@@ -30,6 +31,8 @@ export const DataAgreementProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const AgreementCheckbox: React.FC = () => {
   const { isAgreed, setIsAgreed } = useDataAgreement();
+  const t = useTranslations('signIn');
+
   
   return (
     <div className="flex items-center space-x-2">
@@ -42,9 +45,9 @@ export const AgreementCheckbox: React.FC = () => {
         htmlFor="terms"
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-fourth"
       >
-        I agree to the processing of personal data and have read the{' '}
+        {t('agreement.checkbox')}
         <Link target='_blank' href="https://eoassist.com/privacy-policy" className="text-blue-500 hover:underline">
-          Privacy Policy
+           Privacy Policy
         </Link>
       </label>
     </div>

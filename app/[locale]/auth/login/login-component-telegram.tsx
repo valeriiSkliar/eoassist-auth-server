@@ -3,6 +3,7 @@ import { useDataAgreement } from "@/components/provides/data-agreement-provider"
 import { Button } from "@/components/ui/button";
 import { loger } from "@/lib/console-loger";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { FaTelegram } from 'react-icons/fa';
@@ -12,6 +13,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
     const {data : session} = useSession()
     const [telegramLink, setTelegramLink] = useState<string | null>(null)
     const [error, setError] = useState(null)
+    const t = useTranslations('signIn');
 
     const sendMessage = useCallback((message: {action: string; key: string; value: any}) => {
       if (window?.opener) {
@@ -25,7 +27,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
       e.preventDefault();
       if (!originHost) {
         sendMessage({action: 'error', key: 'originHost', value: {
-          message: 'originHost is not defined'
+          message: t('errors.originHostNotDefined')
         }})
       }
       sendMessage({action: 'startLogin', key: 'telegram', value: originHost});
@@ -66,7 +68,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
           className="w-full"
         >
             <FaTelegram className="mr-2 h-5 w-5" />
-            Sign in with Telegram
+            {t('signInWithTelegram')}
           </Button>
 
     )

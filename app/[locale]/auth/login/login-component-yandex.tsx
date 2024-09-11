@@ -3,6 +3,7 @@ import { useDataAgreement } from "@/components/provides/data-agreement-provider"
 import { Button } from "@/components/ui/button";
 import { loger } from "@/lib/console-loger";
 import { signIn, useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useTransition } from "react";
 import { FaYandex } from 'react-icons/fa';
@@ -17,6 +18,7 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
     const [isPending, startTransition] = useTransition();
     const {data : session} = useSession()
     const { isAgreed } = useDataAgreement();
+    const t = useTranslations('signIn');
 
 
 
@@ -54,7 +56,7 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
           className="w-full"
         >
             <FaYandex className="mr-2 h-5 w-5" />
-            Sign in with Yandex
+            {t('signInWithYandex')}
           </Button>
 
     )

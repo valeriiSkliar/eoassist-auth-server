@@ -3,6 +3,7 @@ import { useDataAgreement } from "@/components/provides/data-agreement-provider"
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
 import { signIn, useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useTransition } from "react";
 import { FaGoogle } from "react-icons/fa";
@@ -16,6 +17,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
       const { isAgreed } = useDataAgreement();
+      const t = useTranslations('signIn');
 
 
     const {data : session} = useSession()
@@ -56,7 +58,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
         >
               <>
                 <FaGoogle className="mr-2 h-5 w-5" />
-                Sign in with Google
+                {t('signInWithGoogle')}
               </>
         </Button>
     )
