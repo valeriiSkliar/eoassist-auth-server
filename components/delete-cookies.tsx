@@ -15,6 +15,8 @@ const DeleteCookies: FC<DeleteCookiesProps> = (props) => {
     const deleteAllCookies = async () => {
       const response = await fetch('api/delete-all-cookies')
       const result = await response.json()
+      document.cookie = "__Secure-authjs.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; secure; samesite=lax";
+
 
     }
 
