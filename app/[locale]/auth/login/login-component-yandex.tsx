@@ -40,16 +40,18 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
 
   };
   useEffect(() => {
+ 
     loger.info('login with yandex', session)
     const user = session?.user ?? {};
     // const provider = Object.hasOwn(user, 'provider') ? user.provider : 'yandex';
     if(session 
-        && session?.user?.provider == 'yandex' 
+        // && session?.user?.provider == 'yandex' 
         && window?.opener) {
+          loger.info('condition with yandex', session)
       sendMessage({ action: 'login', key: 'yandex', value: {
         ...session.user
       }});
-    window.close();
+    // window.close();
     } 
 
 

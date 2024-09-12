@@ -1,4 +1,5 @@
 import { AdaptiveSpiner } from "@/components/adaptive-spiner";
+import DeleteCookies from "@/components/delete-cookies";
 import { DataAgreementProvider } from "@/components/provides/data-agreement-provider";
 import { SignInComponent } from "@/components/sign-in-component";
 import { Env } from "@/lib/Env";
@@ -15,10 +16,14 @@ export default async function Index({searchParams: {originHost}}: {searchParams:
     locale,
     namespace: 'signIn'
   })
+    //  if (session) {
+    //       signOut({ redirect: false });
+    //   };
   return (
     <>
       {/* <PostMessagesListener/> */}
       <AdaptiveSpiner />
+      <DeleteCookies />
       <DataAgreementProvider >
         <SignInComponent translations={{
           title: t('title'),

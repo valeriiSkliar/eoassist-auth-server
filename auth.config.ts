@@ -27,6 +27,11 @@ export const authConfig: NextAuthConfig = {
         return session
         }, 
     },
+    //     session: {
+    //     strategy: "jwt",
+        
+    //     maxAge: 15, // Set session lifetime to 15 seconds
+    // },
     experimental: {
         enableWebAuthn: true,
     },
