@@ -52,6 +52,7 @@ const intlMiddleware = createIntlMiddleware({
     const response = NextResponse.next()
     // const response = intlMiddleware(request)
     const refererFromRequest = request.headers.get('referer') ?? '';
+    // loger.info('locale', request.cookies.getAll())
 
     const subdomain = getSubdomain(refererFromRequest);
     request.headers.set('referal-domain', refererFromRequest ?? '');

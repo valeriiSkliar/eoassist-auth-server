@@ -27,25 +27,23 @@ export const authConfig: NextAuthConfig = {
         },
         async session({ session, user, token }) {
             const exparedAt = new Date(Date.now() + 10000);
-            loger.info('exparedAt', exparedAt)
-
-
-            // session.expires = exparedAt as ( Date & string )
-   
-            session.sessionToken = 'lll'
-            loger.info('session-callback', {
-            session, user
-          })
-          return session
+          //   loger.info('exparedAt', exparedAt)
+          //   loger.info('session-callback', {
+          //   session, user, token
+          // })
+          return {
+            ...session,
+          }
         },
-        async jwt({ token, user, account, profile, isNewUser }) {
-          // loger.info('jwt-callback', { token, user, account, profile, isNewUser })
-          return token
+        async jwt({ token, user, account, profile }) {
+          loger.info('jwt-callback', { token, user, account, profile })
+          return {
+            ...token,
+          }
         }
     },
-        session: {
+    session: {
         // strategy: "jwt",
-        
         maxAge: 10,
     },
     experimental: {
