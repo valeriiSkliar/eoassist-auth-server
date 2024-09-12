@@ -48,12 +48,12 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
       sendMessage({ action: 'login', key: 'telegram', value: {
         telegramLink
       }});
-    // window.close();
+    window.close();
     } else if ( error && window?.opener) {
       sendMessage({ action: 'error', key: 'telegram', value: {
         error
       }});
-      // window.close();
+      window.close();
     }
     
 

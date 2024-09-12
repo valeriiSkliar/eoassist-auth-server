@@ -51,7 +51,7 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
       sendMessage({ action: 'login', key: 'yandex', value: {
         ...session.user
       }});
-    // window.close();
+    window.close();
     } 
 
 

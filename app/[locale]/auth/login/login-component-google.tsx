@@ -47,7 +47,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
         sendMessage({ action: 'login', key: 'google', value: {
           ...session.user
         }});
-      // window.close();
+      window.close();
       } 
 
 
