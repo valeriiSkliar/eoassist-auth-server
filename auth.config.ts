@@ -2,6 +2,7 @@ import type { NextAuthConfig } from 'next-auth';
 import Google from "next-auth/providers/google";
 import Yandex from "next-auth/providers/yandex";
 import { Env } from "./lib/Env";
+import { loger } from './lib/console-loger';
 
 declare module 'next-auth' {
   interface Session {
@@ -11,6 +12,10 @@ declare module 'next-auth' {
 
 export const authConfig: NextAuthConfig = {
     callbacks: {
+        // async signIn({ user, account, profile, email, credentials }) {
+        //   return true
+        // },
+
         async redirect({ url, baseUrl }) {
             const origin = new URL(url)
             if( origin.searchParams.has('originHost')) return origin.toString();
@@ -20,18 +25,29 @@ export const authConfig: NextAuthConfig = {
             baseWithOriginHost.searchParams.set('originHost', url)            
             return baseWithOriginHost.toString();
         },
-        async jwt({token, user, account, profile}) {
-            return token;
+        async session({ session, user, token }) {
+            const exparedAt = new Date(Date.now() + 10000);
+            loger.info('exparedAt', exparedAt)
+
+
+            // session.expires = exparedAt as ( Date & string )
+   
+            session.sessionToken = 'lll'
+            loger.info('session-callback', {
+            session, user
+          })
+          return session
         },
-        async session({session, token,}) {
-        return session
-        }, 
+        async jwt({ token, user, account, profile, isNewUser }) {
+          // loger.info('jwt-callback', { token, user, account, profile, isNewUser })
+          return token
+        }
     },
-    //     session: {
-    //     strategy: "jwt",
+        session: {
+        // strategy: "jwt",
         
-    //     maxAge: 15, // Set session lifetime to 15 seconds
-    // },
+        maxAge: 10,
+    },
     experimental: {
         enableWebAuthn: true,
     },
@@ -98,6 +114,8 @@ export const authConfig: NextAuthConfig = {
         };;
       },
     }),
+
+    // ...add more providers here
     // Credentials({
     //     name: 'EmailPassword',
     //     credentials: {
