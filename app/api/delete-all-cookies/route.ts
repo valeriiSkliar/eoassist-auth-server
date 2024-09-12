@@ -6,6 +6,7 @@ export const  GET = async (req: NextRequest) => {
     const {nextUrl} = req;
     const cookiesStorage = cookies().getAll();
     cookies().delete('authjs.session-token')
+    cookies().delete('__Secure-authjs.session-token')
   
   // res.end('Hello from Vercel!');
   return NextResponse.json({
