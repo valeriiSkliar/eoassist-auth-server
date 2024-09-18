@@ -17,11 +17,8 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
     const {data : session} = useSession()
-    const { isAgreed } = useDataAgreement();
+  const { isAgreed, setIsAgreed, highlightCheckbox } = useDataAgreement();
     const t = useTranslations('signIn');
-    // signOut()
-
-
 
     const sendMessage = useCallback((message: {action: string; key: string; value: any}) => {
       if (window?.opener) {
@@ -30,22 +27,25 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
     }, [originHost])
 
     const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+
+      if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
+
       e.preventDefault();
       sendMessage({action: 'startLogin', key: 'yandex', value: originHost});
       const response = await signIn("yandex", {
         redirectTo: originHost,
       })
 
-      loger.info('response', response)
 
   };
   useEffect(() => {
  
-    loger.info('login with yandex', session)
+
     const user = session?.user ?? {};
-    // const provider = Object.hasOwn(user, 'provider') ? user.provider : 'yandex';
     if(session 
-        // && session?.user?.provider == 'yandex' 
         && window?.opener) {
           loger.info('condition with yandex', session)
       sendMessage({ action: 'login', key: 'yandex', value: {
@@ -58,7 +58,7 @@ export const LoginWithYandex = ({originHost}: {originHost: string}) => {
   }, [session])
     return (
         <Button
-          disabled={isPending || !isAgreed}
+          disabled={isPending}
           type="button"
           onClick={startLogin}
           variant="outline" 

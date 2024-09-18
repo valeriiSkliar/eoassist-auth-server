@@ -16,13 +16,9 @@ declare module 'next-auth' {
 export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     const serchparams = useSearchParams()
     const [isPending, startTransition] = useTransition();
-      const { isAgreed } = useDataAgreement();
+      const { isAgreed, highlightCheckbox } = useDataAgreement();
       const t = useTranslations('signIn');
-
-
     const {data : session} = useSession()
-    // loger.info('login with google', session)
-
 
     const sendMessage = useCallback((message: {action: string; key: string; value: any}) => {
       if (window?.opener) {
@@ -31,6 +27,10 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     }, [originHost]);
 
     const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
       e.preventDefault();
        startTransition(async () => {
         sendMessage({action: 'startLogin', key: 'google', value: originHost});
@@ -56,7 +56,7 @@ export const LoginWithGoogle = ({originHost}: {originHost: string}) => {
     return (
       <Button
           type="button"
-          disabled={!isAgreed}
+          // disabled={!isAgreed}
           onClick={startLogin}
           variant="outline" 
           className={`w-full text-fourth ${Fonts.raleway}`}

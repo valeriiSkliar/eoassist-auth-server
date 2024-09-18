@@ -1,7 +1,6 @@
 'use client'
 import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { Button } from "@/components/ui/button";
-import { loger } from "@/lib/console-loger";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -20,10 +19,14 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
         window?.opener?.postMessage(message, originHost);
       }
     }, [originHost])
-    const { isAgreed } = useDataAgreement();
+    const { isAgreed, highlightCheckbox} = useDataAgreement();
 
 
     const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
       e.preventDefault();
       if (!originHost) {
         sendMessage({action: 'error', key: 'originHost', value: {
@@ -31,19 +34,14 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
         }})
       }
       sendMessage({action: 'startLogin', key: 'telegram', value: originHost});
-    //   const response = await signIn("yandex", {
-    //     redirectTo: originHost,
-    //   })
     const telegramLinkResponse = await fetch(`/api/get-telegram-auth-link?origin=${originHost ?? ''}`)
         .then(res => res.json())
-        // loger.info('telegramLinkResponse',telegramLinkResponse)
         if (telegramLinkResponse.success) {
         setTelegramLink(telegramLinkResponse.data)
         }
 
   };
   useEffect(() => {
-    loger.info('telegramLink', telegramLink)
     if( telegramLink && window?.opener) {
       sendMessage({ action: 'login', key: 'telegram', value: {
         telegramLink
@@ -61,7 +59,7 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
   }, [session, telegramLink])
     return (
         <Button
-          disabled={isPending || !isAgreed}
+          disabled={isPending}
           type="button"
           onClick={startLogin}
           variant="outline" 

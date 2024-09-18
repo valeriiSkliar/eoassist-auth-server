@@ -24,7 +24,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({className, originH
     handleSubmit, 
   } = usePostMessages();
   const [isPending, startTransition] = useTransition();
-  const { isAgreed } = useDataAgreement();
+  const { isAgreed, highlightCheckbox } = useDataAgreement();
   const t = useTranslations('signIn');
 
 
@@ -35,22 +35,26 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({className, originH
     <form ref={formRef} className={`space-y-6 ${className}`}>
     <div className="space-y-2">
       <Label className={`${Fonts.roboto} text-fourth`} htmlFor="email">{t('email')}</Label>
-      <Input disabled={isLoading || !isAgreed}  id="email" type="email" name='email' placeholder={t('emailPlaceholder')} />
+      <Input disabled={isLoading}  id="email" type="email" name='email' placeholder={t('emailPlaceholder')} />
     </div>
     <div className="space-y-2">
       <Label className={`${Fonts.roboto} text-fourth`} htmlFor="password">{t('password')}</Label>
-      <Input disabled={isLoading || !isAgreed} id="password" type="password" name='password' placeholder={t('passwordPlaceholder')} />
+      <Input disabled={isLoading} id="password" type="password" name='password' placeholder={t('passwordPlaceholder')} />
     </div>
     <input type="hidden" name="callbackUrl" value={originHost} />
       <AgreementCheckbox />
 
     <Button 
      onClick={(e) => {
+      if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
       e.preventDefault();
       if (formRef.current) {
         handleSubmit(formRef.current)
       }
-    }} disabled={isLoading || !isAgreed} type="button" className="w-full bg-third">
+    }} disabled={isLoading} type="button" className="w-full bg-third">
     <MdAlternateEmail className="mr-2 h-5 w-5" />
       {t('signInButton')}
     </Button>
