@@ -1,5 +1,4 @@
 'use client'
-import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
@@ -19,14 +18,14 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
         window?.opener?.postMessage(message, originHost);
       }
     }, [originHost])
-    const { isAgreed, highlightCheckbox} = useDataAgreement();
+    // const { isAgreed, highlightCheckbox} = useDataAgreement();
 
 
     const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (!isAgreed) {
-      highlightCheckbox();
-      return;
-    }
+    //   if (!isAgreed) {
+    //   highlightCheckbox();
+    //   return;
+    // }
       e.preventDefault();
       if (!originHost) {
         sendMessage({action: 'error', key: 'originHost', value: {
