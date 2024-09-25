@@ -69,7 +69,10 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               className="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto"
             >
               <div className="pb-4">
-                <LoginWithGoogle originHost={originHost} />
+                <LoginWithGoogle
+                  originHost={originHost}
+                  setAuthInProgress={setAuthInProgress}
+                />
               </div>
               <div className="pb-4">
                 <LoginWithYandex
