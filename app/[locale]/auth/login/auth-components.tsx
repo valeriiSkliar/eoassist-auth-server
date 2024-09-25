@@ -15,7 +15,10 @@ const AuthComponents: FC<AuthComponentsProps> = ({ originHost, t }) => {
   const [authInProgress, setAuthInProgress] = useState(false);
   return (
     <div className="space-y-6">
-      <LoginWithGoogle originHost={originHost} />
+      <LoginWithGoogle
+        setAuthInProgress={setAuthInProgress}
+        originHost={originHost}
+      />
 
       <LoginWithYandex
         setAuthInProgress={setAuthInProgress}
