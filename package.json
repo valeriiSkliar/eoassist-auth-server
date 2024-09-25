@@ -10,6 +10,7 @@
   "author": "Valerii Skliarov <valeriisklyarov@gmail.com>",
   "dependencies": {
     "@auth/unstorage-adapter": "^2.0.0",
+    "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-avatar": "^1.0.3",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.0.3",
