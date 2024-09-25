@@ -9,6 +9,9 @@
     "email": "Электронная почта",
     "emailPlaceholder": "Введите вашу электронную почту",
     "password": "Пароль",
+    "login_options": "Другие варианты входа",
+    "close": "Закрыть",
+    "email_password": "Почта и пароль",
     "passwordPlaceholder": "Введите ваш пароль",
     "signInButton": "Войти",
     "errors": {

@@ -7,31 +7,37 @@ import { auth } from "auth";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
-export default async function Index({searchParams: {originHost}}: {searchParams: {originHost: string}}) {
-  const session = await auth()
-  const head = headers().get('host') ?? ''
-  const urlStartSession = new URL('/api/start-session', Env.DOMAIN);
+export default async function Index({
+  searchParams: { originHost },
+}: {
+  searchParams: { originHost: string };
+}) {
+  const session = await auth();
+  const head = headers().get("host") ?? "";
+  const urlStartSession = new URL("/api/start-session", Env.DOMAIN);
   const locale = await getLocale();
   const t = await getTranslations({
     locale,
-    namespace: 'signIn'
-  })
-    //  if (session) {
-    //       signOut({ redirect: false });
-    //   };
+    namespace: "signIn",
+  });
+
   return (
     <>
-      {/* <PostMessagesListener/> */}
       <AdaptiveSpiner />
       <DeleteCookies />
-      <DataAgreementProvider >
-        <SignInComponent translations={{
-          title: t('title'),
-          welcome: t('welcome'),
-          orContinueWith: t('orContinueWith')
-        }} originHost={originHost}/>
+      <DataAgreementProvider>
+        <SignInComponent
+          translations={{
+            title: t("title"),
+            welcome: t("welcome"),
+            orContinueWith: t("orContinueWith"),
+            email_password: t("email_password"),
+            login_options: t("login_options"),
+            close: t("close"),
+          }}
+          originHost={originHost}
+        />
       </DataAgreementProvider>
-
     </>
-  )
+  );
 }

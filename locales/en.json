@@ -9,6 +9,9 @@
     "email": "Email",
     "emailPlaceholder": "Enter your email",
     "password": "Password",
+    "login_options": "Other login options",
+    "close": "Close",
+    "email_password": "Email & password",
     "passwordPlaceholder": "Enter your password",
     "signInButton": "Sign in",
     "errors": {
