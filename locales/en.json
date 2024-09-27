@@ -19,7 +19,8 @@
       "originHostNotDefined": "Origin host is not defined"
     },
     "agreement": {
-      "checkbox": "I agree to the terms and conditions "
+      "checkbox": "I agree to the terms and conditions ",
+      "policy": "Privacy Policy"
     }
   }
 }
