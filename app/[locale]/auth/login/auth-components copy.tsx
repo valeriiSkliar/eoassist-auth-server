@@ -66,7 +66,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex gap-4 items-center justify-center z-50">
             <div
               ref={authOptionsRef}
-              className="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto"
+              className="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] max-w-[80%] overflow-y-auto"
             >
               <div className="pb-4">
                 <LoginWithGoogle
