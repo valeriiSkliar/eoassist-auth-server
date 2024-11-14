@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Eoassist authentication",
   description: "This is an page for authentication on Eoassist.com",
+  robots: "noindex, nofollow",
 };
 
 export default function RootLayout(props: {
