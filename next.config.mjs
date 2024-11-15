@@ -7,7 +7,24 @@
 /** @type {import("next").NextConfig} */
 
 const nextConfig = {
-  output: "standalone",
+  // output: "standalone",
+  async headers() {
+    return [
+      {
+        source: '/(.*)', // Применяется ко всем маршрутам
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+          // {
+          //   key: 'Cross-Origin-Embedder-Policy',
+          //   value: 'require-corp',
+          // },
+        ],
+      },
+    ];
+  },
   experimental: {
     allowedRevalidateHeaderKeys: ["X-Auth-Token", "x-forwarded-host"],
   }
