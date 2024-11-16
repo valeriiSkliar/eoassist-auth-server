@@ -23,8 +23,6 @@ export default async function Index({
     namespace: "signIn",
   });
 
-  loger.info('locales', AppConfig.locales)
-
   return (
     <>
       <AdaptiveSpiner />
