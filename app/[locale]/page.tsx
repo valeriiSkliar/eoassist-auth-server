@@ -2,7 +2,9 @@ import { AdaptiveSpiner } from "@/components/adaptive-spiner";
 import DeleteCookies from "@/components/delete-cookies";
 import { DataAgreementProvider } from "@/components/provides/data-agreement-provider";
 import { SignInComponent } from "@/components/sign-in-component";
+import { loger } from "@/lib/console-loger";
 import { Env } from "@/lib/Env";
+import { AppConfig } from "@/utils/AppConfig";
 import { auth } from "auth";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -20,6 +22,8 @@ export default async function Index({
     locale,
     namespace: "signIn",
   });
+
+  loger.info('locales', AppConfig.locales)
 
   return (
     <>
