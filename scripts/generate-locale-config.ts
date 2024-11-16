@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const localesDir = path.join(process.cwd(), 'locales');
+const localesDir = path.join(process.cwd(), 'all_locales');
 const outputFile = path.join(process.cwd(), 'utils/generated/locale-config.json');
 
 function getAvailableLocales(): string[] {

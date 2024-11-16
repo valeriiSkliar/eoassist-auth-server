@@ -1,7 +1,8 @@
 {
   "locales": [
     "en",
-    "ru"
+    "ru",
+    "ua"
   ],
   "defaultLocale": "en",
   "localePrefix": "always"
