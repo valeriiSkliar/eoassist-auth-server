@@ -5,7 +5,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env.production') });
 module.exports = {
   apps: [
     {
-      name: 'store-auth',
+      name: 'eoassist-auth',
       script: './build-and-start.js',
       args: 'start',
       cwd: path.join(__dirname, ''),
