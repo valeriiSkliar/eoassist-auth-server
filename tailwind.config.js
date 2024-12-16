@@ -16,31 +16,37 @@ module.exports = {
   		}
   	},
   	extend: {
-  		colors: {
-  			first: {
-  				'30': 'rgba(245, 245, 245, 0.3)',
-  				'50': 'rgba(245, 245, 245, 0.5)',
-  				'80': 'rgba(245, 245, 245, 0.8)',
-  				DEFAULT: '#F5F5F5'
-  			},
-  			second: {
-  				'30': 'rgba(189, 139, 202, 0.3)',
-  				'50': 'rgba(189, 139, 202, 0.5)',
-  				'80': 'rgba(189, 139, 202, 0.8)',
-  				DEFAULT: '#BD8BCA'
-  			},
-  			third: {
-  				'30': 'rgba(158, 86, 178, 0.3)',
-  				'50': 'rgba(158, 86, 178, 0.5)',
-  				'80': 'rgba(158, 86, 178, 0.8)',
-  				DEFAULT: '#9E56B2'
-  			},
-  			fourth: {
-  				'30': 'rgba(73, 85, 99, 0.3)',
-  				'50': 'rgba(73, 85, 99, 0.5)',
-  				'80': 'rgba(73, 85, 99, 0.8)',
-  				DEFAULT: '#495563'
-  			},
+      fontFamily: {
+        sans: ['var(--font-acari)'], // Default font
+        heading: ['var(--font-nevermind)'], // For headings
+        acari: ['var(--font-acari)'],
+        nevermind: ['var(--font-nevermind)'],
+      },
+      colors: {
+          first: {
+            DEFAULT: "#FAF8EF",
+            80: "rgba(250, 248, 239, 0.8)",
+            50: "rgba(250, 248, 239, 0.5)",
+            30: "rgba(250, 248, 239, 0.3)",
+          },
+          second: {
+            DEFAULT: "#F0C548",
+            80: "rgba(240, 197, 72, 0.8)",
+            50: "rgba(240, 197, 72, 0.5)",
+            30: "rgba(240, 197, 72, 0.3)",
+          },
+          third: {
+            DEFAULT: "#31693C",
+            80: "rgba(49, 105, 60, 0.8)",
+            50: "rgba(49, 105, 60, 0.5)",
+            30: "rgba(49, 105, 60, 0.3)",
+          },
+          fourth: {
+            DEFAULT: "#05300E",
+            80: "rgba(5, 48, 14, 0.8)",
+            50: "rgba(5, 48, 14, 0.5)",
+            30: "rgba(5, 48, 14, 0.3)",
+          },
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

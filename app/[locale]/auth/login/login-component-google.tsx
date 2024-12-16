@@ -1,12 +1,13 @@
 "use client";
 import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { Button } from "@/components/ui/button";
-import Fonts from "@/lib/fonts/font-cache";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { FaGoogle } from "react-icons/fa";
+import { acariSans, nevermind } from '@/fonts/font-cache';
+
 declare module "next-auth" {
   interface User {
     provider?: string;
@@ -73,7 +74,7 @@ export const LoginWithGoogle = ({
       disabled={isPendingState}
       onClick={startLogin}
       variant="outline"
-      className={`w-full text-fourth ${Fonts.raleway}`}
+      className={`w-full text-fourth ${acariSans.className}`}
     >
       <>
         <FaGoogle className="mr-2 h-5 w-5" />

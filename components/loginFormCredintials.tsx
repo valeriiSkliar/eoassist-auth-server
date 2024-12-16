@@ -1,5 +1,4 @@
 "use client";
-import Fonts from "@/lib/fonts/font-cache";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useRef, useTransition, type FC } from "react";
@@ -9,6 +8,7 @@ import { usePostMessages } from "./provides/postMessage-provider";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { acariSans, nevermind } from "@/fonts/font-cache";
 
 interface LoginFormCredintialsProps {
   className?: string;
@@ -19,7 +19,6 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
   className,
   originHost,
 }) => {
-  // const [state, formAction] = useFormState<any, FormData>(credentialsFormAction, undefined);
   const serchparams = useSearchParams();
   const { isLoading, error, handleSubmit } = usePostMessages();
   const [isPending, startTransition] = useTransition();
@@ -32,7 +31,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
     <>
       <form ref={formRef} className={`space-y-6 ${className}`}>
         <div className="space-y-2">
-          <Label className={`${Fonts.roboto} text-fourth`} htmlFor="email">
+          <Label className={`${acariSans.className} text-fourth`} htmlFor="email">
             {t("email")}
           </Label>
           <Input
@@ -44,7 +43,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
           />
         </div>
         <div className="space-y-2">
-          <Label className={`${Fonts.roboto} text-fourth`} htmlFor="password">
+          <Label className={`${acariSans.className} text-fourth`} htmlFor="password">
             {t("password")}
           </Label>
           <Input
@@ -70,12 +69,14 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
           }}
           disabled={isLoading}
           type="button"
-          className="w-full bg-third"
+          className={`${acariSans.className} flex items-center justify-center w-full bg-third`}
         >
           <MdAlternateEmail className="mr-2 h-5 w-5" />
           {t("signInButton")}
         </Button>
-        {error && <p className="text-destructive">{error}</p>}
+        {error && (
+          <p className={`${nevermind.className} text-destructive`}>{error}</p>
+        )}
       </form>
     </>
   );

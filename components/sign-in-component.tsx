@@ -1,5 +1,5 @@
 import AuthComponents from "@/app/[locale]/auth/login/auth-components copy";
-import Fonts from "@/lib/fonts/font-cache";
+import { acariSans, nevermind } from '@/fonts/font-cache';
 
 const SignInComponent = ({
   originHost,
@@ -14,12 +14,12 @@ const SignInComponent = ({
         <div className="space-y-4 text-center">
           <LockIcon className="mx-auto h-12 w-12 text-muted-foreground text-third" />
           <h2
-            className={`text-3xl font-bold tracking-tight text-fourth ${Fonts.raleway.className}`}
+            className={`text-3xl font-bold tracking-tight text-fourth ${acariSans.className}`}
           >
             {translations?.title}
           </h2>
           <p
-            className={`text-muted-foreground text-fourth ${Fonts.raleway.className}`}
+            className={`text-muted-foreground text-fourth ${nevermind.className}`}
           >
             {translations.welcome}
           </p>

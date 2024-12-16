@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { FaYandex } from "react-icons/fa";
+import { acariSans, nevermind } from '@/fonts/font-cache';
 
 export const LoginWithYandex = ({
   originHost,
@@ -66,7 +67,7 @@ export const LoginWithYandex = ({
       type="button"
       onClick={startLogin}
       variant="outline"
-      className="w-full"
+      className={`w-full text-fourth ${acariSans.className}`}
     >
       <FaYandex className="mr-2 h-5 w-5" />
       {t("signInWithYandex")}

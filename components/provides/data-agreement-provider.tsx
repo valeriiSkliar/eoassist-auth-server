@@ -9,6 +9,7 @@ import React, {
   useState,
 } from "react";
 import { Checkbox } from "../ui/checkbox";
+import { acariSans, nevermind } from '@/fonts/font-cache';
 
 interface DataAgreementContextType {
   isAgreed: boolean;
@@ -106,12 +107,15 @@ export const AgreementCheckbox: React.FC = () => {
             checked={isAgreed}
             onCheckedChange={(checked) => setIsAgreed(checked as boolean)}
           />
-          <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
+          <label
+            htmlFor="terms"
+            className={`ml-2 text-sm text-gray-700 ${nevermind.className}`}
+          >
             {t("agreement.checkbox")}
             <Link
               target="_blank"
               href="https://eoassist.com/privacy-policy"
-              className="text-yellow-600 hover:underline ml-1"
+              className={`text-yellow-600 hover:underline ml-1 ${nevermind.className}`}
             >
               {t("agreement.policy")}
             </Link>

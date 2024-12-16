@@ -28,7 +28,7 @@ export default async function Index({
       <AdaptiveSpiner />
       <DeleteCookies />
       <DataAgreementProvider>
-        <SignInComponent
+        <SignInComponent 
           translations={{
             title: t("title"),
             welcome: t("welcome"),

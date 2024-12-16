@@ -1,11 +1,11 @@
 "use client";
 import LoginFormCredintials from "@/components/loginFormCredintials";
 import { AgreementCheckbox } from "@/components/provides/data-agreement-provider";
-import Fonts from "@/lib/fonts/font-cache";
 import React, { useEffect, useRef, useState } from "react";
 import { LoginWithGoogle } from "./login-component-google";
 import { LoginWithTelegram } from "./login-component-telegram";
 import { LoginWithYandex } from "./login-component-yandex";
+import { acariSans, nevermind } from '@/fonts/font-cache';
 
 interface AuthComponentsProps {
   originHost: string;
@@ -51,7 +51,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span
-            className={`bg-background px-2 text-muted-foreground text-fourth ${Fonts.raleway.className}`}
+            className={`bg-background px-2 text-muted-foreground text-fourth ${nevermind.className}`}
           >
             {t.orContinueWith}
           </span>
@@ -59,7 +59,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
       </div>
 
       <div className="custom-dropdown">
-        <button onClick={toggleOptions} className="dropdown-toggle">
+        <button type="button" onClick={toggleOptions} className={`dropdown-toggle ${nevermind.className}`}>
           {t.login_options}
         </button>
         {optionsIsOpen && (
@@ -86,7 +86,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               <AgreementCheckbox />
               <button
                 onClick={toggleOptions}
-                className="mt-4 w-full bg-gray-200 hover:bg-gray-300 py-4 rounded"
+                className={`mt-4 w-full bg-gray-200 hover:bg-gray-300 py-4 rounded-md ${nevermind.className}`}
               >
                 {t.close}
               </button>
