@@ -2,15 +2,12 @@ import SessionPovider from "@/components/auth/session-povider";
 import { AppConfig } from "@/utils/AppConfig";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, useMessages } from "next-intl";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { acariSans, nevermind } from '@/fonts/font-cache';
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Eoassist authentication",
-  description: "This is an page for authentication on Eoassist.com",
+  title: "LiviAssist authentication",
+  description: "This is an page for authentication on LiviAssist.com",
   robots: "noindex, nofollow"
 };
 
@@ -24,7 +21,7 @@ export default function RootLayout(props: {
   return (
     <html className={`${acariSans.variable} ${nevermind.variable} font-sans`}
     lang={locale}>
-      <body className={inter.className}>
+      <body className={acariSans.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col justify-between w-full h-full min-h-screen">
             {/* <Header /> */}
