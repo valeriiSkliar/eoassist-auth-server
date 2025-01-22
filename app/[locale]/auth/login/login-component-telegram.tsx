@@ -1,5 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
+import { loger } from "@/lib/console-loger";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -32,10 +33,12 @@ export const LoginWithTelegram = ({originHost}: {originHost: string}) => {
           message: t('errors.originHostNotDefined')
         }})
       }
+      loger.info('originHost', originHost)
       sendMessage({action: 'startLogin', key: 'telegram', value: originHost});
     const telegramLinkResponse = await fetch(`/api/get-telegram-auth-link?origin=${originHost ?? ''}`)
         .then(res => res.json())
         if (telegramLinkResponse.success) {
+          loger.info('telegramLinkResponse', telegramLinkResponse)
         setTelegramLink(telegramLinkResponse.data)
         }
 
