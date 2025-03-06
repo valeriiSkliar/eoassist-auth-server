@@ -2,6 +2,9 @@ import { fetchData } from "@/lib/fetch-date";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
+// Mark this route as dynamic since it uses request.url
+export const dynamic = 'force-dynamic';
+
 interface ResetPasswordResponse {
   success: boolean;
   message?: string;
