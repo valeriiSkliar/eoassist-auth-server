@@ -21,7 +21,7 @@ export default function RootLayout(props: {
   const messages = useMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col justify-between w-full h-full min-h-screen">
