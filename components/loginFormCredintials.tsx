@@ -9,6 +9,7 @@ import { usePostMessages } from "./provides/postMessage-provider";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { ResetPasswordDialog } from "./ui/ResetPasswordDialog";
 
 interface LoginFormCredintialsProps {
   className?: string;
@@ -54,6 +55,11 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
             name="password"
             placeholder={t("passwordPlaceholder")}
           />
+          <ResetPasswordDialog>
+            <Button variant="link" className="px-0">
+              {t("forgotPassword")}
+            </Button>
+          </ResetPasswordDialog>
         </div>
         <input type="hidden" name="callbackUrl" value={originHost} />
 
