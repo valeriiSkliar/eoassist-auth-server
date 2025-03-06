@@ -14,6 +14,7 @@
     "email_password": "Email & password",
     "passwordPlaceholder": "Enter your password",
     "signInButton": "Sign in",
+    "forgotPassword": "Forgot password?",
     "errors": {
       "general": "An error occurred. Please try again.",
       "originHostNotDefined": "Origin host is not defined"
@@ -22,5 +23,33 @@
       "checkbox": "I agree to the terms and conditions ",
       "policy": "Privacy Policy"
     }
+  },
+  "resetPassword": {
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordDescription": "Enter your email address and we'll send you a link to reset your password.",
+    "setNewPasswordTitle": "Set New Password",
+      "setNewPasswordDescription": "Enter and confirm your new password.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "emailRequired": "Valid email is required",
+    "sendResetLink": "Send Reset Link",
+    "sending": "Sending...",
+    "resetLinkSent": "Reset link has been sent to your email address. Please check your inbox.",
+    "resetError": "Failed to send reset link. Please try again.",
+    "backToLogin": "Back to Login",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "resetPassword": "Reset Password",
+    "resetting": "Resetting...",
+    "passwordResetSuccess": "Your password has been reset successfully. You can now login with your new password.",
+    "passwordResetError": "Failed to reset password. Please try again.",
+    "invalidResetLink": "The reset link appears to be invalid or expired.",
+    "manuallyProceed": "Proceed Anyway",
+    "proceedToReset": "Set New Password",
+    "backToRequestForm": "Back to Request Form",
+    "forgotPassword": "Forgot password?"
   }
 }

@@ -14,6 +14,7 @@
     "email_password": "Почта и пароль",
     "passwordPlaceholder": "Введите ваш пароль",
     "signInButton": "Войти",
+    "forgotPassword": "Забыли пароль?",
     "errors": {
       "general": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
       "originHostNotDefined": "Исходный хост не определен"
@@ -22,5 +23,33 @@
       "checkbox": "Я согласен на обработку моих персональных данных и ознакомлен(а) с ",
       "policy": "Политикой конфиденциальности"
     }
+  },
+  "resetPassword": {
+    "resetPasswordTitle": "Сброс пароля",
+    "resetPasswordDescription": "Введите ваш email-адрес, и мы отправим вам ссылку для сброса пароля.",
+    "setNewPasswordTitle": "Установка нового пароля",
+    "setNewPasswordDescription": "Введите и подтвердите ваш новый пароль.",
+    "email": "Email",
+    "emailPlaceholder": "Введите ваш email",
+    "emailRequired": "Требуется действительный email",
+    "sendResetLink": "Отправить ссылку для сброса",
+    "sending": "Отправка...",
+    "resetLinkSent": "Ссылка для сброса пароля отправлена на ваш email. Пожалуйста, проверьте почту.",
+    "resetError": "Не удалось отправить ссылку для сброса. Пожалуйста, попробуйте еще раз.",
+    "backToLogin": "Вернуться к входу",
+    "newPassword": "Новый пароль",
+    "newPasswordPlaceholder": "Введите новый пароль",
+    "confirmPassword": "Подтверждение пароля",
+    "confirmPasswordPlaceholder": "Подтвердите новый пароль",
+    "passwordsDoNotMatch": "Пароли не совпадают",
+    "resetPassword": "Сбросить пароль",
+    "resetting": "Сброс...",
+    "passwordResetSuccess": "Ваш пароль успешно сброшен. Теперь вы можете войти, используя новый пароль.",
+    "passwordResetError": "Не удалось сбросить пароль. Пожалуйста, попробуйте еще раз.",
+    "invalidResetLink": "Ссылка для сброса пароля недействительна или просрочена.",
+    "manuallyProceed": "Продолжить в любом случае",
+    "proceedToReset": "Установить новый пароль",
+    "backToRequestForm": "Вернуться к форме запроса",
+    "forgotPassword": "Забыли пароль?"
   }
 }
