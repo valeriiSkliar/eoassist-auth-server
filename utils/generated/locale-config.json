@@ -1,0 +1,9 @@
+{
+  "locales": [
+    "en",
+    "ru",
+    "ua"
+  ],
+  "defaultLocale": "en",
+  "localePrefix": "always"
+}

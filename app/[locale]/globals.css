@@ -35,7 +35,33 @@
     --radius: 0.5rem;
   }
 }
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
 
+.dropdown-toggle {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  width: 100%;
+}
+
+.dropdown-content.show {
+  display: block;
+}
 @layer base {
   * {
     @apply border-border;

@@ -1,0 +1,26 @@
+{
+  "signIn": {
+    "title": "Sign in to your account",
+    "welcome": "Welcome back! Please enter your details to continue.",
+    "orContinueWith": "Or continue with",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithYandex": "Sign in with Yandex",
+    "signInWithTelegram": "Sign in with Telegram",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "login_options": "Other login options",
+    "close": "Close",
+    "email_password": "Email & password",
+    "passwordPlaceholder": "Enter your password",
+    "signInButton": "Sign in",
+    "errors": {
+      "general": "An error occurred. Please try again.",
+      "originHostNotDefined": "Origin host is not defined"
+    },
+    "agreement": {
+      "checkbox": "I agree to the terms and conditions ",
+      "policy": "Privacy Policy"
+    }
+  }
+}

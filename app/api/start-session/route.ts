@@ -43,7 +43,6 @@ export { notAllowed as DELETE, notAllowed as GET, notAllowed as HEAD, notAllowed
 
 const getRequestBody = async (req: NextRequest) => {
     const body = await req.json();
-    // loger.info('body-auth-server', body)
     return body;
   }
   

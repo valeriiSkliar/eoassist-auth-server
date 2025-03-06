@@ -23,6 +23,8 @@ const googleUserSchema = z.object({
     name: z.string(),
     email: z.string().email(),
     image: z.string().url(),
+    domain: z.string().optional().nullable(),
+    auth_key: z.string().optional(),
   });
   
   const userSchema = z.object({

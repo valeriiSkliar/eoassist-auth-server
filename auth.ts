@@ -39,7 +39,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({...config, ...authC
 
 declare module "next-auth" {
   interface Session {
-    accessToken?: string
+    accessToken?: string,
+    provider: string;
+
   }
 }
 

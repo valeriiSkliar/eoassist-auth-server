@@ -1,0 +1,26 @@
+{
+  "signIn": {
+    "title": "Войдите в свой аккаунт",
+    "welcome": "С возвращением! Пожалуйста, введите свои данные, чтобы продолжить.",
+    "orContinueWith": "Или продолжить с помощью",
+    "signInWithGoogle": "Войти через Google",
+    "signInWithYandex": "Войти через Яндекс",
+    "signInWithTelegram": "Войти через Telegram",
+    "email": "Электронная почта",
+    "emailPlaceholder": "Введите вашу электронную почту",
+    "password": "Пароль",
+    "login_options": "Другие варианты входа",
+    "close": "Закрыть",
+    "email_password": "Почта и пароль",
+    "passwordPlaceholder": "Введите ваш пароль",
+    "signInButton": "Войти",
+    "errors": {
+      "general": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
+      "originHostNotDefined": "Исходный хост не определен"
+    },
+    "agreement": {
+      "checkbox": "Я согласен на обработку моих персональных данных и ознакомлен(а) с ",
+      "policy": "Политикой конфиденциальности"
+    }
+  }
+}

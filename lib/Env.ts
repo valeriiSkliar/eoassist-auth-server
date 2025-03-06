@@ -13,6 +13,7 @@ export const Env = createEnv({
     API_KEY: z.string().min(1),
     DOMAIN: z.string().min(1),
     NEXTAUTH_URL: z.string().min(1),
+    API_SERVER_URL: z.string().min(1),
   },
   client: {
     // AUTH_SECRET: z.string().min(1),
@@ -31,5 +32,6 @@ export const Env = createEnv({
     API_KEY: process.env.API_KEY,
     DOMAIN: process.env.DOMAIN,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    API_SERVER_URL: process.env.API_SERVER_URL,
   },
 });
