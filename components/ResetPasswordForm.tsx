@@ -72,10 +72,6 @@ export function ResetPasswordForm({ onBackToLogin, onResetSuccess }: ResetPasswo
 
   return (
     <div className="space-y-4">
-      {/* <div className="text-center">
-        <h1 className="text-2xl font-bold">{t('resetPasswordTitle')}</h1>
-        <p className="text-muted-foreground mt-2">{t('resetPasswordDescription')}</p>
-      </div> */}
       
       {status.type && (
         <Alert variant={status.type === 'success' ? 'default' : 'destructive'}>
@@ -97,7 +93,7 @@ export function ResetPasswordForm({ onBackToLogin, onResetSuccess }: ResetPasswo
           />
         </div>
         
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-third-80 hover:bg-third-50" disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
