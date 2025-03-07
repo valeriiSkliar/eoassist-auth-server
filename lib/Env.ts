@@ -14,6 +14,7 @@ export const Env = createEnv({
     DOMAIN: z.string().min(1),
     NEXTAUTH_URL: z.string().min(1),
     API_SERVER_URL: z.string().min(1),
+    SHORT_DOMAIN: z.string().min(1),
   },
   client: {
     // AUTH_SECRET: z.string().min(1),
@@ -33,5 +34,6 @@ export const Env = createEnv({
     DOMAIN: process.env.DOMAIN,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     API_SERVER_URL: process.env.API_SERVER_URL,
+    SHORT_DOMAIN: process.env.SHORT_DOMAIN,
   },
 });

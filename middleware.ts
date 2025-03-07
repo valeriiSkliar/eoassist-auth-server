@@ -105,5 +105,5 @@ export default function middleware( req: NextRequest, event: NextPage) {
 }
 
 export const config = {
-  сопоставитель: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 }

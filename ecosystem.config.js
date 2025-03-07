@@ -7,7 +7,7 @@ module.exports = {
     {
       name: 'eoassist-auth',
       script: './build-and-start.js',
-      args: `start --port ${process.env.PORT}`,
+      // Remove args as we're handling port in build-and-start.js
       cwd: path.join(__dirname, ''),
       watch: ['all_locales'],
       watch_delay: 1000,
