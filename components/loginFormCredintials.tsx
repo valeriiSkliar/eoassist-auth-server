@@ -55,7 +55,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
             name="password"
             placeholder={t("passwordPlaceholder")}
           />
-          <ResetPasswordDialog>
+          <ResetPasswordDialog closeDelay={1000}>
             <Button variant="link" className="px-0">
               {t("forgotPassword")}
             </Button>

@@ -28,6 +28,8 @@ interface PostMessagesContextType {
     originHost: string | null
     formState: FormDataType;
     error: string | null;
+    close: boolean;
+    setClose: (value: boolean) => void;
     setLogInSuccessHandler:(state: boolean) => void;
     sendMessage: (message: MessageDataType) => void
     setIsLoading: (value: boolean) => void;
@@ -112,6 +114,17 @@ interface PostMessagesContextType {
         if (action === 'close-window') {
             setClose(true)
         }
+        
+        // Handle reset password related messages from parent
+        if (action === 'reset-password-response') {
+            // Handle any response from parent about reset password
+            if (key === 'success') {
+                setError(null)
+                setIsLoadingHendler(false)
+            } else if (key === 'error') {
+                setError(value)
+            }
+        }
 
         setTimeout(() => {
             setIsLoadingHendler(false)
@@ -143,6 +156,8 @@ interface PostMessagesContextType {
             formState,
             error,
             isLogInSuccess,
+            close,
+            setClose,
             setLogInSuccessHandler,
             sendMessage: sendMessageHandler,
             setIsLoading: setIsLoadingHendler,
