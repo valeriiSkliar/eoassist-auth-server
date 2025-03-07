@@ -58,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         "auth.eoassist.store",
         "eoassist.store",
         ".eoassist.store",
-        `${Env.DOMAIN}`
+        `${Env.SHORT_DOMAIN}`
       ].includes(host);
     }
   }
