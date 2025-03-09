@@ -2,10 +2,13 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '.env.production') });
+
+console.log(process.env.PROJECT_NAME);
+
 module.exports = {
   apps: [
     {
-      name: 'eoassist-auth',
+      name: process.env.PROJECT_NAME,
       script: './build-and-start.js',
       // Remove args as we're handling port in build-and-start.js
       cwd: path.join(__dirname, ''),
@@ -17,6 +20,7 @@ module.exports = {
       pre_start: ['npm run build'],
       env_production: {
         NODE_ENV: 'production',
+        PROJECT_NAME: process.env.PROJECT_NAME,
         DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
         LOGTAIL_SOURCE_TOKEN: process.env.LOGTAIL_SOURCE_TOKEN,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
@@ -39,6 +43,7 @@ module.exports = {
       },
       env_development: {
         NODE_ENV: 'development',
+        PROJECT_NAME: process.env.PROJECT_NAME,
         DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
         LOGTAIL_SOURCE_TOKEN: process.env.LOGTAIL_SOURCE_TOKEN,
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
