@@ -53,7 +53,7 @@ export const LoginWithGoogle = ({
     });
   };
   useEffect(() => {
-    if (session && window?.opener) {
+    if (session && window?.opener && session.user?.provider === 'google') {
       sendMessage({
         action: "login",
         key: "google",
@@ -65,7 +65,7 @@ export const LoginWithGoogle = ({
       sessionStorage.removeItem("ongoingAuth");
       window.close();
     }
-  }, [session]);
+  }, [session, sendMessage, setAuthInProgress]);
 
   return (
     <Button

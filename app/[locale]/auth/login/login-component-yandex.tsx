@@ -46,7 +46,7 @@ export const LoginWithYandex = ({
   };
 
   useEffect(() => {
-    if (session && window?.opener) {
+    if (session && window?.opener && session.user?.provider === 'yandex') {
       sendMessage({
         action: "login",
         key: "yandex",
