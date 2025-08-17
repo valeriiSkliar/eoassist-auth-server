@@ -1,5 +1,5 @@
 "use client";
-import { useDataAgreement } from "@/components/provides/data-agreement-provider";
+
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
 import { signIn, useSession } from "next-auth/react";
@@ -22,7 +22,7 @@ export const LoginWithGoogle = ({
 }) => {
   const serchparams = useSearchParams();
   const { data: session } = useSession();
-  const { isAgreed, highlightCheckbox } = useDataAgreement();
+
   const t = useTranslations("signIn");
   const [isPending, startTransition] = useTransition();
   const [isPendingState, setIsPendingState] = useState(false);
@@ -37,10 +37,6 @@ export const LoginWithGoogle = ({
   );
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isAgreed) {
-      highlightCheckbox();
-      return;
-    }
     e.preventDefault();
     setIsPendingState(true);
     setAuthInProgress(true);
@@ -53,7 +49,7 @@ export const LoginWithGoogle = ({
     });
   };
   useEffect(() => {
-    if (session && window?.opener && session.user?.provider === 'google') {
+    if (session && window?.opener && session.user?.provider === "google") {
       sendMessage({
         action: "login",
         key: "google",

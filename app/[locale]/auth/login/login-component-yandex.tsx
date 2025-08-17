@@ -1,5 +1,5 @@
 "use client";
-import { useDataAgreement } from "@/components/provides/data-agreement-provider";
+
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
@@ -16,7 +16,7 @@ export const LoginWithYandex = ({
 }) => {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
-  const { isAgreed, highlightCheckbox } = useDataAgreement();
+
   const t = useTranslations("signIn");
   const [isPending, setIsPending] = useState(false);
 
@@ -30,11 +30,6 @@ export const LoginWithYandex = ({
   );
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isAgreed) {
-      highlightCheckbox();
-      return;
-    }
-
     e.preventDefault();
     setIsPending(true);
     setAuthInProgress(true);
@@ -46,7 +41,7 @@ export const LoginWithYandex = ({
   };
 
   useEffect(() => {
-    if (session && window?.opener && session.user?.provider === 'yandex') {
+    if (session && window?.opener && session.user?.provider === "yandex") {
       sendMessage({
         action: "login",
         key: "yandex",

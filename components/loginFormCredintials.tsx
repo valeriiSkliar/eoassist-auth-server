@@ -4,7 +4,10 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useRef, useTransition, type FC } from "react";
 import { MdAlternateEmail } from "react-icons/md";
-import { useDataAgreement } from "./provides/data-agreement-provider";
+import {
+  AgreementCheckbox,
+  useDataAgreement,
+} from "./provides/data-agreement-provider";
 import { usePostMessages } from "./provides/postMessage-provider";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -63,6 +66,8 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
         </div>
         <input type="hidden" name="callbackUrl" value={originHost} />
 
+        <AgreementCheckbox />
+
         <Button
           onClick={(e) => {
             if (!isAgreed) {
@@ -74,7 +79,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
               handleSubmit(formRef.current);
             }
           }}
-          disabled={isLoading}
+          disabled={isLoading || !isAgreed}
           type="button"
           className="w-full bg-third"
         >

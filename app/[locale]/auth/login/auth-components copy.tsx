@@ -1,6 +1,6 @@
 "use client";
 import LoginFormCredintials from "@/components/loginFormCredintials";
-import { AgreementCheckbox } from "@/components/provides/data-agreement-provider";
+
 import Fonts from "@/lib/fonts/font-cache";
 import React, { useEffect, useRef, useState } from "react";
 import { LoginWithGoogle } from "./login-component-google";
@@ -83,7 +83,6 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               <div className="pb-4">
                 <LoginFormCredintials originHost={originHost} />
               </div>
-              <AgreementCheckbox />
               <button
                 onClick={toggleOptions}
                 className="mt-4 w-full bg-gray-200 hover:bg-gray-300 py-4 rounded"
