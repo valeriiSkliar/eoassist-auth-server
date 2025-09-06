@@ -35,7 +35,27 @@ const config = {
         sameSite: "lax" as const,
         path: "/",
         secure: true,
+        // Динамическая установка domain на основе запроса
+        // Будет переопределяться в callbacks для поддержки мультидоменов
         domain: process.env.NODE_ENV === "production" ? `.${Env.SHORT_DOMAIN}` : undefined
+      },
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/",
+        secure: true,
+      },
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax" as const,
+        path: "/",
+        secure: true,
       },
     },
   },
@@ -52,14 +72,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig.callbacks,
     authorized({ request }) {
       const { host } = request.nextUrl;
-      return [
+      
+      // Разрешенные домены и поддомены
+      const allowedDomains = [
         "localhost",
         "127.0.0.1",
         "auth.eoassist.store",
         "eoassist.store",
         ".eoassist.store",
+        "auth.eoassist.com",
+        "eoassist.com",
+        ".eoassist.com",
+        "auth.eoassist.ru",
+        "eoassist.ru",
+        ".eoassist.ru",
         `${Env.SHORT_DOMAIN}`
-      ].includes(host);
+      ];
+      
+      // Проверяем прямое совпадение
+      if (allowedDomains.includes(host)) {
+        return true;
+      }
+      
+      // Проверяем, является ли хост поддоменом разрешенных доменов
+      const allowedBaseDomains = ["eoassist.store", "eoassist.com", "eoassist.ru"];
+      return allowedBaseDomains.some(domain => 
+        host === domain || host.endsWith(`.${domain}`)
+      );
     }
   }
 })

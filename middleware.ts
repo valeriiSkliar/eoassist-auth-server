@@ -3,7 +3,7 @@ import NextAuth from "next-auth";
 import createIntlMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
-import { Env } from "./lib/Env";
+import { loger } from "./lib/console-loger";
 import { generateApiKey } from "./lib/generate-api-key";
 import { AppConfig } from "./utils/AppConfig";
 
@@ -50,30 +50,69 @@ const intlMiddleware = createIntlMiddleware({
   async (request) => {
     request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
     const response = NextResponse.next()
-    // const response = intlMiddleware(request)
+    
+    // Получаем referer и originHost из параметров запроса
     const refererFromRequest = request.headers.get('referer') ?? '';
-    // loger.info('locale', request.cookies.getAll())
+    const url = new URL(request.url);
+    const originHost = url.searchParams.get('originHost');
+    
+    // Определяем источник запроса
+    const sourceUrl = originHost || refererFromRequest;
+    
+    // Логируем для отладки
+    loger.info('Middleware processing', { 
+      referer: refererFromRequest, 
+      originHost, 
+      sourceUrl,
+      host: request.headers.get('host')
+    });
 
-    const subdomain = getSubdomain(refererFromRequest);
-    request.headers.set('referal-domain', refererFromRequest ?? '');
-    request.cookies.set('referal-domain', refererFromRequest ?? '');
-    response.cookies.set('referal-domain', refererFromRequest ?? '');
-    response.headers.set('referal-domain', refererFromRequest ?? '');
-
-    const referalDomain = request.cookies.get('referal-domain')?.value ?? '';
-    if (!referalDomain) {
-      if (!refererFromRequest.startsWith(Env.NEXTAUTH_URL)) {
-        const subdomain = getSubdomain(refererFromRequest);
-        request.headers.set('referal-domain', refererFromRequest ?? '');
-        request.cookies.set('referal-domain', refererFromRequest ?? '');
-        response.cookies.set('referal-domain', refererFromRequest ?? '');
-        response.headers.set('referal-domain', refererFromRequest ?? '');
+    // Сохраняем информацию о домене-источнике
+    if (sourceUrl) {
+      const subdomain = getSubdomain(sourceUrl);
+      request.headers.set('referal-domain', sourceUrl);
+      request.cookies.set('referal-domain', sourceUrl);
+      response.cookies.set('referal-domain', sourceUrl);
+      response.headers.set('referal-domain', sourceUrl);
+      
+      // Если есть originHost, сохраняем его отдельно
+      if (originHost) {
+        response.cookies.set('origin-host', originHost);
       }
     }
 
-    response.headers.set('Access-Control-Allow-Origin', '*');
+    // Настраиваем CORS для поддержки всех разрешенных доменов
+    const allowedOrigins = [
+      'https://eoassist.com',
+      'https://*.eoassist.com',
+      'https://eoassist.ru', 
+      'https://*.eoassist.ru',
+      'https://eoassist.store',
+      'https://*.eoassist.store'
+    ];
+    
+    const origin = request.headers.get('origin');
+    if (origin) {
+      // Проверяем, соответствует ли origin разрешенным доменам
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (allowed.includes('*')) {
+          const pattern = allowed.replace('*', '.*');
+          return new RegExp(`^${pattern}$`).test(origin);
+        }
+        return allowed === origin;
+      });
+      
+      if (isAllowed) {
+        response.headers.set('Access-Control-Allow-Origin', origin);
+      }
+    } else {
+      // Если origin не указан, разрешаем для всех (для разработки)
+      response.headers.set('Access-Control-Allow-Origin', '*');
+    }
+    
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
 
     if (request.method === 'OPTIONS') {
       return new NextResponse(null, {

@@ -50,18 +50,22 @@ export const LoginWithGoogle = ({
   };
   useEffect(() => {
     if (session && window?.opener && session.user?.provider === "google") {
+      // Формируем redirectLink на основе originHost
+      const redirectLink = originHost || window.location.origin;
+      
       sendMessage({
         action: "login",
         key: "google",
         value: {
           ...session.user,
+          redirectLink: redirectLink, // Добавляем redirectLink для правильного редиректа
         },
       });
       setAuthInProgress(false);
       sessionStorage.removeItem("ongoingAuth");
       window.close();
     }
-  }, [session, sendMessage, setAuthInProgress]);
+  }, [session, sendMessage, setAuthInProgress, originHost]);
 
   return (
     <Button

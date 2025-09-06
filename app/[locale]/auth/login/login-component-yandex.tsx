@@ -42,18 +42,22 @@ export const LoginWithYandex = ({
 
   useEffect(() => {
     if (session && window?.opener && session.user?.provider === "yandex") {
+      // Формируем redirectLink на основе originHost
+      const redirectLink = originHost || window.location.origin;
+
       sendMessage({
         action: "login",
         key: "yandex",
         value: {
           ...session.user,
+          redirectLink: redirectLink, // Добавляем redirectLink для правильного редиректа
         },
       });
       setAuthInProgress(false);
       sessionStorage.removeItem("ongoingAuth");
       window.close();
     }
-  }, [session, sendMessage, setAuthInProgress]);
+  }, [session, sendMessage, setAuthInProgress, originHost]);
 
   return (
     <Button

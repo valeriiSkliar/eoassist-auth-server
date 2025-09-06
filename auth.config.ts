@@ -17,12 +17,35 @@ export const authConfig: NextAuthConfig = {
         // },
 
         async redirect({ url, baseUrl }) {
-            const origin = new URL(url)
-            if( origin.searchParams.has('originHost')) return origin.toString();
-            // loger.info('redirect', {url, baseUrl})
-            if(url.startsWith(baseUrl)) return baseUrl;
+            const origin = new URL(url);
+            
+            // Если есть originHost параметр, сохраняем его
+            if (origin.searchParams.has('originHost')) {
+                const originHost = origin.searchParams.get('originHost')!;
+                
+                // Проверяем, что originHost - это валидный домен из разрешенных
+                try {
+                    const originUrl = new URL(originHost.startsWith('http') ? originHost : `https://${originHost}`);
+                    const allowedDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store'];
+                    const isAllowed = allowedDomains.some(domain => 
+                        originUrl.hostname.endsWith(domain)
+                    );
+                    
+                    if (isAllowed) {
+                        // Сохраняем originHost в URL для последующего использования
+                        return origin.toString();
+                    }
+                } catch (e) {
+                    loger.info('Invalid originHost', { originHost, error: e });
+                }
+            }
+            
+            // Если URL начинается с baseUrl, используем baseUrl
+            if (url.startsWith(baseUrl)) return baseUrl;
+            
+            // В остальных случаях добавляем originHost параметр
             const baseWithOriginHost = new URL(baseUrl);
-            baseWithOriginHost.searchParams.set('originHost', url)            
+            baseWithOriginHost.searchParams.set('originHost', url);
             return baseWithOriginHost.toString();
         },
         async session({ session, user, token }) {
