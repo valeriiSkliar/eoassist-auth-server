@@ -24,21 +24,6 @@ export function getSubdomain(url: string): string  {
 }
 let publicPages = ['/','sites/*','about',]
 
-
-
-// const baseMiddleware: CustomMiddleware = async (request, event, response) => {
-//   request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
-//   return response;
-// };
-
-// export default chain([
-//   withCorsMiddleware,
-//   withReferralMiddleware,
-//   withAuthMiddleware,
-//   withI18nMiddleware,
-//   baseMiddleware
-// ]);
-
 const { auth } = NextAuth(authConfig);
 const intlMiddleware = createIntlMiddleware({
   locales: AppConfig.locales,
@@ -50,6 +35,10 @@ const intlMiddleware = createIntlMiddleware({
   async (request) => {
     request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
     const response = NextResponse.next()
+
+    // Получаем заголовки от ru-proxy из основного middleware (уже установлены в cookies)
+    const xOriginServer = request.headers.get('x-origin-server') || request.cookies.get('x-origin-server')?.value;
+    const xProxyHost = request.headers.get('x-proxy-host') || request.cookies.get('x-proxy-host')?.value;
     
     // Получаем referer и originHost из параметров запроса
     const refererFromRequest = request.headers.get('referer') ?? '';
@@ -59,17 +48,58 @@ const intlMiddleware = createIntlMiddleware({
     // Определяем источник запроса
     const sourceUrl = originHost || refererFromRequest;
     
-    // Логируем для отладки
-    loger.info('Middleware processing', { 
+    // Логируем для отладки в authMiddleware
+    loger.info('[AUTH-MIDDLEWARE] Request processing', { 
       referer: refererFromRequest, 
       originHost, 
       sourceUrl,
-      host: request.headers.get('host')
+      host: request.headers.get('host'),
+      xOriginServer,
+      xProxyHost,
+      url: request.url,
+      pathname: url.pathname,
+      timestamp: new Date().toISOString()
     });
 
+    // Обязательно сохраняем заголовки ru-proxy в cookies и headers для NextAuth callbacks
+    if (xOriginServer) {
+      request.cookies.set('x-origin-server', xOriginServer);
+      response.cookies.set('x-origin-server', xOriginServer, { 
+        httpOnly: false, // Делаем доступным для клиента
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+      });
+      response.headers.set('x-origin-server', xOriginServer);
+      
+      // Устанавливаем глобальные переменные для NextAuth callbacks
+      (globalThis as any).__NEXT_PRIVATE_ORIGIN_SERVER = xOriginServer;
+      
+      loger.info('[AUTH-MIDDLEWARE] X-ORIGIN-SERVER set', {
+        xOriginServer,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    if (xProxyHost) {
+      request.cookies.set('x-proxy-host', xProxyHost);
+      response.cookies.set('x-proxy-host', xProxyHost, { 
+        httpOnly: false, // Делаем доступным для клиента
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+      });
+      response.headers.set('x-proxy-host', xProxyHost);
+      
+      // Устанавливаем глобальные переменные для NextAuth callbacks
+      (globalThis as any).__NEXT_PRIVATE_PROXY_HOST = xProxyHost;
+      
+      loger.info('[AUTH-MIDDLEWARE] X-PROXY-HOST set', {
+        xProxyHost,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
     // Сохраняем информацию о домене-источнике
     if (sourceUrl) {
-      const subdomain = getSubdomain(sourceUrl);
       request.headers.set('referal-domain', sourceUrl);
       request.cookies.set('referal-domain', sourceUrl);
       response.cookies.set('referal-domain', sourceUrl);
@@ -126,6 +156,44 @@ const intlMiddleware = createIntlMiddleware({
 )
 
 export default function middleware( req: NextRequest, event: NextPage) {
+
+  loger.info('[MIDDLEWARE ROOT] Incoming request headers', {
+    url: req.url,
+    pathname: req.nextUrl.pathname,
+    xOriginServer: req.headers.get('x-origin-server'),
+    xProxyHost: req.headers.get('x-proxy-host'),
+    host: req.headers.get('host'),
+    xForwardedHost: req.headers.get('x-forwarded-host'),
+    timestamp: new Date().toISOString()
+  });
+  
+  const xOriginServer = req.headers.get('x-origin-server'),
+        xProxyHost = req.headers.get('x-proxy-host');
+        
+  // Обрабатываем ru-proxy заголовки для всех запросов
+  if (xOriginServer === 'ru-proxy') {
+    req.cookies.set('x-origin-server', xOriginServer);
+    req.cookies.set('x-proxy-host', xProxyHost || '');
+    
+    // Устанавливаем глобальные переменные для NextAuth callbacks
+    (globalThis as any).__NEXT_PRIVATE_ORIGIN_SERVER = xOriginServer;
+    (globalThis as any).__NEXT_PRIVATE_PROXY_HOST = xProxyHost;
+    
+    // Добавляем search параметр для NextAuth, если его еще нет
+    if (!req.nextUrl.searchParams.has('ruProxy') && xProxyHost) {
+      req.nextUrl.searchParams.set('ruProxy', 'true');
+      req.nextUrl.searchParams.set('ruProxyHost', xProxyHost);
+    }
+    
+    loger.info('[MIDDLEWARE ROOT] RU-PROXY headers processed', {
+      xOriginServer,
+      xProxyHost,
+      pathname: req.nextUrl.pathname,
+      hasRuProxyParam: req.nextUrl.searchParams.has('ruProxy'),
+      timestamp: new Date().toISOString()
+    });
+  }
+
   const publicPathnameRegex = RegExp(
     `^(/(${AppConfig.locales.join("|")}))?(${publicPages
       .flatMap((p) => (p === "/" ? ["", "/"] : p))
@@ -135,8 +203,41 @@ export default function middleware( req: NextRequest, event: NextPage) {
 
   const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
 
+  loger.info('[MIDDLEWARE ROOT] Page routing decision', {
+    pathname: req.nextUrl.pathname,
+    isPublicPage,
+    willUseAuthMiddleware: !isPublicPage,
+    timestamp: new Date().toISOString()
+  });
+
   if (isPublicPage) {
-    return intlMiddleware(req);
+    const response = intlMiddleware(req);
+    
+    // Для публичных страниц тоже передаем ru-proxy заголовки в ответе
+    if (xOriginServer === 'ru-proxy') {
+      if (response instanceof NextResponse) {
+        response.cookies.set('x-origin-server', xOriginServer, { 
+          httpOnly: false,
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production'
+        });
+        response.cookies.set('x-proxy-host', xProxyHost || '', { 
+          httpOnly: false,
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production'
+        });
+        response.headers.set('x-origin-server', xOriginServer);
+        response.headers.set('x-proxy-host', xProxyHost || '');
+        
+        loger.info('[MIDDLEWARE ROOT] RU-PROXY headers set in public page response', {
+          xOriginServer,
+          xProxyHost,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+    
+    return response;
   } else {
     // @ts-ignore
     return (authMiddleware)(req, event);
