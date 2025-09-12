@@ -6,6 +6,7 @@ import { authConfig } from "./auth.config";
 import { loger } from "./lib/console-loger";
 import { generateApiKey } from "./lib/generate-api-key";
 import { AppConfig } from "./utils/AppConfig";
+import { getDomainZoneFromHeaders, setDomainInfoCookie } from "./lib/domain-zone";
 
 export function getSubdomain(url: string): string  {
   if (!url) {
@@ -35,6 +36,18 @@ const intlMiddleware = createIntlMiddleware({
   async (request) => {
     request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
     const response = NextResponse.next()
+    
+    // Определяем доменную зону
+    const domainInfo = getDomainZoneFromHeaders(request.headers, request.cookies);
+    setDomainInfoCookie(response, domainInfo);
+    
+    // Устанавливаем глобальную переменную для доступа из любой точки приложения
+    (globalThis as any).__DOMAIN_INFO = domainInfo;
+    
+    loger.info('[AUTH-MIDDLEWARE] Domain zone detected', {
+      domainInfo,
+      timestamp: new Date().toISOString()
+    });
 
     // Получаем заголовки от ru-proxy из основного middleware (уже установлены в cookies)
     const xOriginServer = request.headers.get('x-origin-server') || request.cookies.get('x-origin-server')?.value;
@@ -156,10 +169,17 @@ const intlMiddleware = createIntlMiddleware({
 )
 
 export default function middleware( req: NextRequest, event: NextPage) {
+  
+  // Определяем доменную зону на самом раннем этапе
+  const domainInfo = getDomainZoneFromHeaders(req.headers, req.cookies);
+  
+  // Устанавливаем глобальную переменную для доступа из любой точки приложения
+  (globalThis as any).__DOMAIN_INFO = domainInfo;
 
   loger.info('[MIDDLEWARE ROOT] Incoming request headers', {
     url: req.url,
     pathname: req.nextUrl.pathname,
+    domainInfo,
     xOriginServer: req.headers.get('x-origin-server'),
     xProxyHost: req.headers.get('x-proxy-host'),
     host: req.headers.get('host'),
@@ -213,9 +233,12 @@ export default function middleware( req: NextRequest, event: NextPage) {
   if (isPublicPage) {
     const response = intlMiddleware(req);
     
-    // Для публичных страниц тоже передаем ru-proxy заголовки в ответе
-    if (xOriginServer === 'ru-proxy') {
-      if (response instanceof NextResponse) {
+    // Для публичных страниц тоже передаем domain info и ru-proxy заголовки в ответе
+    if (response instanceof NextResponse) {
+      // Устанавливаем domain info для публичных страниц
+      setDomainInfoCookie(response, domainInfo);
+      
+      if (xOriginServer === 'ru-proxy') {
         response.cookies.set('x-origin-server', xOriginServer, { 
           httpOnly: false,
           sameSite: 'lax',
@@ -232,6 +255,7 @@ export default function middleware( req: NextRequest, event: NextPage) {
         loger.info('[MIDDLEWARE ROOT] RU-PROXY headers set in public page response', {
           xOriginServer,
           xProxyHost,
+          domainInfo,
           timestamp: new Date().toISOString()
         });
       }
