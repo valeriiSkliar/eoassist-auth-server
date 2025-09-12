@@ -43,11 +43,6 @@ const intlMiddleware = createIntlMiddleware({
     
     // Устанавливаем глобальную переменную для доступа из любой точки приложения
     (globalThis as any).__DOMAIN_INFO = domainInfo;
-    
-    loger.info('[AUTH-MIDDLEWARE] Domain zone detected', {
-      domainInfo,
-      timestamp: new Date().toISOString()
-    });
 
     // Получаем заголовки от ru-proxy из основного middleware (уже установлены в cookies)
     const xOriginServer = request.headers.get('x-origin-server') || request.cookies.get('x-origin-server')?.value;
@@ -176,16 +171,6 @@ export default function middleware( req: NextRequest, event: NextPage) {
   // Устанавливаем глобальную переменную для доступа из любой точки приложения
   (globalThis as any).__DOMAIN_INFO = domainInfo;
 
-  loger.info('[MIDDLEWARE ROOT] Incoming request headers', {
-    url: req.url,
-    pathname: req.nextUrl.pathname,
-    domainInfo,
-    xOriginServer: req.headers.get('x-origin-server'),
-    xProxyHost: req.headers.get('x-proxy-host'),
-    host: req.headers.get('host'),
-    xForwardedHost: req.headers.get('x-forwarded-host'),
-    timestamp: new Date().toISOString()
-  });
   
   const xOriginServer = req.headers.get('x-origin-server'),
         xProxyHost = req.headers.get('x-proxy-host');
@@ -252,12 +237,6 @@ export default function middleware( req: NextRequest, event: NextPage) {
         response.headers.set('x-origin-server', xOriginServer);
         response.headers.set('x-proxy-host', xProxyHost || '');
         
-        loger.info('[MIDDLEWARE ROOT] RU-PROXY headers set in public page response', {
-          xOriginServer,
-          xProxyHost,
-          domainInfo,
-          timestamp: new Date().toISOString()
-        });
       }
     }
     
