@@ -56,37 +56,60 @@ export function detectDomainZone(urlString: string): DomainInfo {
 
 export function getDomainZoneFromHeaders(
   headers: Headers,
-  cookies?: any
+  cookies?: any,
+  url?: URL
 ): DomainInfo {
   // Приоритет определения источника:
-  // 1. x-proxy-host (для ru-proxy)
-  // 2. x-origin-server + host
-  // 3. origin header
-  // 4. referer header
-  // 5. host header
+  // 1. URL параметр mirror (основной метод)
+  // 2. x-proxy-host (для ru-proxy)
+  // 3. x-origin-server + host
+  // 4. origin header
+  // 5. referer header
+  // 6. host header
   
+  // 1. ПРИОРИТЕТНО: Проверяем URL параметр mirror
+  if (url) {
+    const mirrorParam = url.searchParams.get('mirror');
+    if (mirrorParam) {
+      // Определяем зону на основе параметра mirror
+      const zone: DomainZone = mirrorParam === 'ru' ? 'ru' : 
+                               mirrorParam === 'com' ? 'com' : 
+                               mirrorParam === 'store' ? 'store' : 'com'; // по умолчанию
+      
+      // Используем текущий host для определения полного домена
+      const host = headers.get('host') || '';
+      return {
+        zone,
+        fullDomain: host,
+        subdomain: host.split('.').length > 2 ? host.split('.').slice(0, -2).join('.') : '',
+        baseDomain: zone === 'ru' ? 'eoassist.ru' : 
+                   zone === 'store' ? 'eoassist.store' : 'eoassist.com'
+      };
+    }
+  }
+
   const xProxyHost = headers.get('x-proxy-host') || cookies?.get('x-proxy-host')?.value;
   const xOriginServer = headers.get('x-origin-server') || cookies?.get('x-origin-server')?.value;
   const origin = headers.get('origin');
   const referer = headers.get('referer');
   const host = headers.get('host');
   
-  // Если есть x-proxy-host (ru-proxy), используем его
+  // 2. FALLBACK: Если есть x-proxy-host (ru-proxy), используем его
   if (xProxyHost) {
     return detectDomainZone(xProxyHost);
   }
   
-  // Если есть origin, используем его
+  // 3. FALLBACK: Если есть origin, используем его
   if (origin) {
     return detectDomainZone(origin);
   }
   
-  // Если есть referer, используем его
+  // 4. FALLBACK: Если есть referer, используем его
   if (referer) {
     return detectDomainZone(referer);
   }
   
-  // Используем host как последний вариант
+  // 5. FALLBACK: Используем host как последний вариант
   if (host) {
     return detectDomainZone(host);
   }

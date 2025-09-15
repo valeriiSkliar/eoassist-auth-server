@@ -4,9 +4,9 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
 import { loger } from "./lib/console-loger";
+import { getDomainZoneFromHeaders, setDomainInfoCookie } from "./lib/domain-zone";
 import { generateApiKey } from "./lib/generate-api-key";
 import { AppConfig } from "./utils/AppConfig";
-import { getDomainZoneFromHeaders, setDomainInfoCookie } from "./lib/domain-zone";
 
 export function getSubdomain(url: string): string  {
   if (!url) {
@@ -37,8 +37,9 @@ const intlMiddleware = createIntlMiddleware({
     request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
     const response = NextResponse.next()
     
-    // Определяем доменную зону
-    const domainInfo = getDomainZoneFromHeaders(request.headers, request.cookies);
+    // Определяем доменную зону (учитывая URL параметры, включая mirror)
+    const requestUrl = new URL(request.url);
+    const domainInfo = getDomainZoneFromHeaders(request.headers, request.cookies, requestUrl);
     setDomainInfoCookie(response, domainInfo);
     
     // Устанавливаем глобальную переменную для доступа из любой точки приложения
@@ -165,8 +166,9 @@ const intlMiddleware = createIntlMiddleware({
 
 export default function middleware( req: NextRequest, event: NextPage) {
   
-  // Определяем доменную зону на самом раннем этапе
-  const domainInfo = getDomainZoneFromHeaders(req.headers, req.cookies);
+  // Определяем доменную зону на самом раннем этапе (учитывая URL параметры, включая mirror)
+  const requestUrl = new URL(req.url);
+  const domainInfo = getDomainZoneFromHeaders(req.headers, req.cookies, requestUrl);
   
   // Устанавливаем глобальную переменную для доступа из любой точки приложения
   (globalThis as any).__DOMAIN_INFO = domainInfo;
@@ -220,7 +222,7 @@ export default function middleware( req: NextRequest, event: NextPage) {
     
     // Для публичных страниц тоже передаем domain info и ru-proxy заголовки в ответе
     if (response instanceof NextResponse) {
-      // Устанавливаем domain info для публичных страниц
+      // Устанавливаем domain info для публичных страниц (уже определено выше с учетом mirror)
       setDomainInfoCookie(response, domainInfo);
       
       if (xOriginServer === 'ru-proxy') {

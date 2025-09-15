@@ -1,5 +1,6 @@
 "use client";
 import LoginFormCredintials from "@/components/loginFormCredintials";
+import { useDomainInfo } from "@/hooks/use-domain-info";
 
 import Fonts from "@/lib/fonts/font-cache";
 import React, { useEffect, useRef, useState } from "react";
@@ -16,6 +17,9 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
   const [optionsIsOpen, setOptionsIsOpen] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
   const authOptionsRef = useRef<HTMLDivElement>(null);
+
+  // Демонстрация работы новой системы определения доменной зоны
+  const domainInfo = useDomainInfo();
 
   useEffect(() => {
     const ongoingAuth = sessionStorage.getItem("ongoingAuth");
@@ -43,7 +47,29 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
   };
   return (
     <div id="auth-options" className="space-y-6">
-      <LoginWithTelegram originHost={originHost} />
+      {/* Индикатор зоны и доступных методов авторизации */}
+      <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+        {/* <div>
+          <strong>Зона:</strong> {domainInfo.zone} |<strong> Домен:</strong>{" "}
+          {domainInfo.fullDomain} |<strong> Базовый:</strong>{" "}
+          {domainInfo.baseDomain}
+          {domainInfo.subdomain && (
+            <span>
+              {" "}
+              | <strong>Поддомен:</strong> {domainInfo.subdomain}
+            </span>
+          )}
+        </div> */}
+        <div className="mt-1">
+          <strong>Доступные методы:</strong> Telegram, Email +
+          {domainInfo.zone === "com" && " Google"}
+          {domainInfo.zone === "ru" && " Yandex"}
+          {(domainInfo.zone === "store" || domainInfo.zone === "unknown") &&
+            " Google (по умолчанию)"}
+        </div>
+      </div>
+
+      <LoginWithTelegram domainZone={domainInfo.zone} originHost={originHost} />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
@@ -68,18 +94,37 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               ref={authOptionsRef}
               className="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] max-w-[80%] overflow-y-auto"
             >
-              <div className="pb-4">
-                <LoginWithGoogle
-                  originHost={originHost}
-                  setAuthInProgress={setAuthInProgress}
-                />
-              </div>
-              <div className="pb-4">
-                <LoginWithYandex
-                  originHost={originHost}
-                  setAuthInProgress={setAuthInProgress}
-                />
-              </div>
+              {/* Google авторизация только для зоны COM */}
+              {domainInfo.zone === "com" && (
+                <div className="pb-4">
+                  <LoginWithGoogle
+                    originHost={originHost}
+                    setAuthInProgress={setAuthInProgress}
+                  />
+                </div>
+              )}
+
+              {/* Yandex авторизация только для зоны RU */}
+              {domainInfo.zone === "ru" && (
+                <div className="pb-4">
+                  <LoginWithYandex
+                    originHost={originHost}
+                    setAuthInProgress={setAuthInProgress}
+                  />
+                </div>
+              )}
+
+              {/* Для зоны STORE или UNKNOWN показываем Google по умолчанию */}
+              {(domainInfo.zone === "store" ||
+                domainInfo.zone === "unknown") && (
+                <div className="pb-4">
+                  <LoginWithGoogle
+                    originHost={originHost}
+                    setAuthInProgress={setAuthInProgress}
+                  />
+                </div>
+              )}
+
               <div className="pb-4">
                 <LoginFormCredintials originHost={originHost} />
               </div>

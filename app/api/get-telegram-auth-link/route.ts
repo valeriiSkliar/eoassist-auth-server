@@ -6,13 +6,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (req: NextRequest) => {
     const origin = req.nextUrl.searchParams.get('origin');
+    const domainZone = req.nextUrl.searchParams.get('domainZone');
     const apiResponse = await fetchData('api/users/telegram-auth-link', 'GET', {
         headers: {
             'Domain': getSubdomain(origin ?? ''),
         }
-    })
+    }, { mirror: domainZone ?? 'com' })
 
-    if(!apiResponse) {
+    if(!apiResponse) {  
         return NextResponse.json({
         success: false,
         message: 'Failed to get Telegram auth link',
@@ -22,6 +23,7 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.json({
         success: true,
         data: apiResponse,
-        origin
+        origin,
+        domainZone
     })
 }
