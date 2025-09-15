@@ -3,7 +3,6 @@ import LoginFormCredintials from "@/components/loginFormCredintials";
 import Fonts from "@/lib/fonts/font-cache";
 import { useState, type FC } from "react";
 import { LoginWithGoogle } from "./login-component-google";
-import { LoginWithTelegram } from "./login-component-telegram";
 import { LoginWithYandex } from "./login-component-yandex";
 
 interface AuthComponentsProps {
@@ -25,7 +24,7 @@ const AuthComponents: FC<AuthComponentsProps> = ({ originHost, t }) => {
         originHost={originHost}
       />
 
-      <LoginWithTelegram originHost={originHost} />
+      {/* <LoginWithTelegram  originHost={originHost} /> */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
