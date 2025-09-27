@@ -104,14 +104,16 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       return normalizedState;
     }
 
-    try {
-      const openerOrigin = window?.opener?.origin;
-      const normalizedOpener = normalizeOrigin(openerOrigin ?? null);
-      if (normalizedOpener) {
-        return normalizedOpener;
+    if (typeof window !== "undefined") {
+      try {
+        const openerOrigin = window.opener?.origin ?? null;
+        const normalizedOpener = normalizeOrigin(openerOrigin);
+        if (normalizedOpener) {
+          return normalizedOpener;
+        }
+      } catch (error) {
+        loger.error("Unable to read opener origin", { error });
       }
-    } catch (error) {
-      loger.error("Unable to read opener origin", { error });
     }
 
     if (typeof document !== "undefined" && document.referrer) {
@@ -124,6 +126,10 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     const cookieOrigin = normalizeOrigin(resolveCookie("origin-host"));
     if (cookieOrigin) {
       return cookieOrigin;
+    }
+
+    if (typeof window !== "undefined") {
+      return normalizeOrigin(window.location.origin);
     }
 
     return null;
@@ -145,7 +151,7 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const sendMessageHandler = useCallback(
     (message: MessageDataType) => {
-      if (!window?.opener) {
+      if (typeof window === "undefined" || !window.opener) {
         loger.error("postMessage skipped: no opener window", { message });
         return;
       }
@@ -169,7 +175,11 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     const callbackUrl = formData.get("callbackUrl")?.toString() ?? "";
 
     // Используем callbackUrl (который содержит originHost) как redirectLink
-    const redirectLink = callbackUrl || originHost || window.location.origin;
+    const fallbackOrigin =
+      originHost ||
+      (typeof window !== "undefined" ? window.location.origin : "");
+
+    const redirectLink = callbackUrl || fallbackOrigin;
 
     setFormState({
       // values: {
@@ -239,19 +249,21 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    loger.info("window?.opener", window?.opener);
-    if (window?.opener) {
-      setOpener(window?.opener);
-    }
-    if (window) {
+    if (typeof window !== "undefined") {
+      loger.info("window.opener", window.opener);
+      if (window.opener) {
+        setOpener(window.opener);
+      }
       loger.info("set-addEventListener");
       window.addEventListener("message", handleParentMessages);
-    }
-    if (close) {
-      window.close();
+      if (close) {
+        window.close();
+      }
+
+      return () => window.removeEventListener("message", handleParentMessages);
     }
 
-    return () => window.removeEventListener("message", handleParentMessages);
+    return () => undefined;
   }, [originHost, close]);
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 import Fonts from "@/lib/fonts/font-cache";
 import { useTranslations } from "next-intl";
-import { useRef, useMemo, type FC } from "react";
+import { useMemo, useRef, type FC } from "react";
 import { MdAlternateEmail } from "react-icons/md";
 import {
   AgreementCheckbox,
@@ -23,8 +23,12 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
   originHost,
 }) => {
   // const [state, formAction] = useFormState<any, FormData>(credentialsFormAction, undefined);
-  const { isLoading, error, handleSubmit, originHost: contextOriginHost } =
-    usePostMessages();
+  const {
+    isLoading,
+    error,
+    handleSubmit,
+    originHost: contextOriginHost,
+  } = usePostMessages();
   const { isAgreed, highlightCheckbox } = useDataAgreement();
   const t = useTranslations("signIn");
 
@@ -41,10 +45,15 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
       try {
         return new URL(document.referrer).origin;
       } catch (error) {
-        return window.location.origin;
+        if (typeof window !== "undefined") {
+          return window.location.origin;
+        }
       }
     }
-    return window.location.origin;
+    if (typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    return null;
   }, [contextOriginHost, originHost]);
 
   return (
@@ -79,7 +88,11 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
             </Button>
           </ResetPasswordDialog>
         </div>
-        <input type="hidden" name="callbackUrl" value={resolvedOriginHost} />
+        <input
+          type="hidden"
+          name="callbackUrl"
+          value={resolvedOriginHost ?? ""}
+        />
 
         <AgreementCheckbox />
 

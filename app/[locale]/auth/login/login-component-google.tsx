@@ -38,10 +38,15 @@ export const LoginWithGoogle = ({
       try {
         return new URL(document.referrer).origin;
       } catch (error) {
-        return window.location.origin;
+        if (typeof window !== "undefined") {
+          return window.location.origin;
+        }
       }
     }
-    return window.location.origin;
+    if (typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    return null;
   }, [contextOriginHost, originHost]);
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -50,18 +55,25 @@ export const LoginWithGoogle = ({
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
     startTransition(async () => {
+      const targetOrigin =
+        resolvedOriginHost ??
+        (typeof window !== "undefined" ? window.location.origin : "");
       sendMessage({
         action: "startLogin",
         key: "google",
-        value: resolvedOriginHost,
+        value: targetOrigin,
       });
       const response = await signIn("google", {
-        redirectTo: resolvedOriginHost,
+        redirectTo: targetOrigin,
       });
     });
   };
   useEffect(() => {
-    if (session && window?.opener && session.user?.provider === "google") {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (session && window.opener && session.user?.provider === "google") {
       // Формируем redirectLink на основе originHost
       const redirectLink = resolvedOriginHost || window.location.origin;
 

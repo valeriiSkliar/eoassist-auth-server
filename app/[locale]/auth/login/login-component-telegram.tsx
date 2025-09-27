@@ -30,10 +30,15 @@ export const LoginWithTelegram = ({
       try {
         return new URL(document.referrer).origin;
       } catch (error) {
-        return window.location.origin;
+        if (typeof window !== "undefined") {
+          return window.location.origin;
+        }
       }
     }
-    return window.location.origin;
+    if (typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    return null;
   }, [contextOriginHost, originHost]);
   // const { isAgreed, highlightCheckbox} = useDataAgreement();
 
@@ -43,7 +48,7 @@ export const LoginWithTelegram = ({
     //   return;
     // }
     e.preventDefault();
-    if (!resolvedOriginHost) {
+    if (!resolvedOriginHost && typeof window === "undefined") {
       sendMessage({
         action: "error",
         key: "originHost",
@@ -54,14 +59,17 @@ export const LoginWithTelegram = ({
     }
     setIsPending(true);
     try {
+      const targetOrigin =
+        resolvedOriginHost ??
+        (typeof window !== "undefined" ? window.location.origin : "");
       sendMessage({
         action: "startLogin",
         key: "telegram",
-        value: resolvedOriginHost,
+        value: targetOrigin,
       });
       const response = await fetch(
         `/api/get-telegram-auth-link?origin=${encodeURIComponent(
-          resolvedOriginHost
+          targetOrigin ?? ""
         )}&domainZone=${domainZone}`
       );
       const telegramLinkResponse = await response.json();
@@ -79,7 +87,11 @@ export const LoginWithTelegram = ({
     }
   };
   useEffect(() => {
-    if (telegramLink && window?.opener) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (telegramLink && window.opener) {
       sendMessage({
         action: "login",
         key: "telegram",
@@ -88,7 +100,7 @@ export const LoginWithTelegram = ({
         },
       });
       window.close();
-    } else if (error && window?.opener) {
+    } else if (error && window.opener) {
       sendMessage({
         action: "error",
         key: "telegram",

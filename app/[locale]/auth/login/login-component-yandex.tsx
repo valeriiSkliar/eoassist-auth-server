@@ -31,10 +31,15 @@ export const LoginWithYandex = ({
       try {
         return new URL(document.referrer).origin;
       } catch (error) {
-        return window.location.origin;
+        if (typeof window !== "undefined") {
+          return window.location.origin;
+        }
       }
     }
-    return window.location.origin;
+    if (typeof window !== "undefined") {
+      return window.location.origin;
+    }
+    return null;
   }, [contextOriginHost, originHost]);
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -42,10 +47,13 @@ export const LoginWithYandex = ({
     setIsPending(true);
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
-    sendMessage({ action: "startLogin", key: "yandex", value: resolvedOriginHost });
+    const targetOrigin =
+      resolvedOriginHost ??
+      (typeof window !== "undefined" ? window.location.origin : "");
+    sendMessage({ action: "startLogin", key: "yandex", value: targetOrigin });
     try {
       await signIn("yandex", {
-        redirectTo: `${resolvedOriginHost}/auth/callback/yandex`,
+        redirectTo: `${targetOrigin}/auth/callback/yandex`,
       });
     } finally {
       setIsPending(false);
@@ -53,6 +61,9 @@ export const LoginWithYandex = ({
   };
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
     if (session && window?.opener && session.user?.provider === "yandex") {
       // Формируем redirectLink на основе originHost
       const redirectLink = resolvedOriginHost || window.location.origin;
