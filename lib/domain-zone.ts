@@ -19,12 +19,12 @@ export function detectDomainZone(urlString: string): DomainInfo {
     let subdomain = '';
     
     // Проверяем известные доменные зоны
-    if (hostname.includes('eoassist.com') || hostname.endsWith('.com')) {
+    if (hostname.includes('eoassist.com') || hostname.includes('nutroassist.com') || hostname.endsWith('.com')) {
       zone = 'com';
-      baseDomain = 'eoassist.com';
-    } else if (hostname.includes('eoassist.ru') || hostname.endsWith('.ru')) {
+      baseDomain = hostname.includes('nutroassist.com') ? 'nutroassist.com' : 'eoassist.com';
+    } else if (hostname.includes('eoassist.ru') || hostname.includes('nutroassist.ru') || hostname.endsWith('.ru')) {
       zone = 'ru';
-      baseDomain = 'eoassist.ru';
+      baseDomain = hostname.includes('nutroassist.ru') ? 'nutroassist.ru' : 'eoassist.ru';
     } else if (hostname.includes('eoassist.store') || hostname.endsWith('.store')) {
       zone = 'store';
       baseDomain = 'eoassist.store';
@@ -82,8 +82,9 @@ export function getDomainZoneFromHeaders(
         zone,
         fullDomain: host,
         subdomain: host.split('.').length > 2 ? host.split('.').slice(0, -2).join('.') : '',
-        baseDomain: zone === 'ru' ? 'eoassist.ru' : 
-                   zone === 'store' ? 'eoassist.store' : 'eoassist.com'
+        baseDomain: zone === 'ru' ? (host.includes('nutroassist') ? 'nutroassist.ru' : 'eoassist.ru') : 
+                   zone === 'store' ? 'eoassist.store' : 
+                   (host.includes('nutroassist') ? 'nutroassist.com' : 'eoassist.com')
       };
     }
   }

@@ -86,6 +86,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         "auth.eoassist.ru",
         "eoassist.ru",
         ".eoassist.ru",
+        '.nutroassist.com',
+        '.nutroassist.ru',
+        'auth.nutroassist.com',
+        'nutroassist.com',
+        'nutroassist.ru',
+        `auth.${Env.SHORT_DOMAIN}`,
         `${Env.SHORT_DOMAIN}`
       ];
       
@@ -95,7 +101,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       
       // Проверяем, является ли хост поддоменом разрешенных доменов
-      const allowedBaseDomains = ["eoassist.store", "eoassist.com", "eoassist.ru"];
+      const allowedBaseDomains = ["eoassist.store", "eoassist.com", "eoassist.ru", "nutroassist.com", "nutroassist.ru", Env.SHORT_DOMAIN];
       return allowedBaseDomains.some(domain => 
         host === domain || host.endsWith(`.${domain}`)
       );

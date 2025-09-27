@@ -16,7 +16,7 @@ export function getBaseDomainForCookie(url: string): string | undefined {
     const cleanHostname = hostname.replace(/^www\./, '');
     
     // Определяем базовые домены
-    const baseDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store'];
+    const baseDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store', 'nutroassist.com', 'nutroassist.ru'];
     
     // Находим соответствующий базовый домен
     for (const baseDomain of baseDomains) {
@@ -45,7 +45,7 @@ export function getBaseDomainForCookie(url: string): string | undefined {
  * @returns true если домен разрешен
  */
 export function isAllowedDomain(domain: string): boolean {
-  const allowedDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store'];
+  const allowedDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store', 'nutroassist.com', 'nutroassist.ru'];
   const cleanDomain = domain.replace(/^www\./, '').toLowerCase();
   
   return allowedDomains.some(allowed => 
@@ -92,7 +92,7 @@ export function getSubdomainFromUrl(url: string): string | null {
     const cleanHostname = hostname.replace(/^www\./, '');
     
     // Базовые домены
-    const baseDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store'];
+    const baseDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store', 'nutroassist.com', 'nutroassist.ru'];
     
     for (const baseDomain of baseDomains) {
       if (cleanHostname.endsWith(`.${baseDomain}`)) {

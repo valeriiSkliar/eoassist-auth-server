@@ -24,8 +24,16 @@ export function useDomainInfo(): DomainInfo {
       const currentDomain = window.location.hostname;
       const parts = currentDomain.split('.');
       const subdomain = parts.length > 2 ? parts.slice(0, -2).join('.') : '';
-      const baseDomain = zone === 'ru' ? 'eoassist.ru' : 
-                         zone === 'store' ? 'eoassist.store' : 'eoassist.com';
+      
+      // Определяем базовый домен в зависимости от зоны и текущего домена
+      let baseDomain = 'eoassist.com'; // по умолчанию
+      if (zone === 'ru') {
+        baseDomain = currentDomain.includes('nutroassist.ru') ? 'nutroassist.ru' : 'eoassist.ru';
+      } else if (zone === 'store') {
+        baseDomain = 'eoassist.store';
+      } else if (zone === 'com') {
+        baseDomain = currentDomain.includes('nutroassist.com') ? 'nutroassist.com' : 'eoassist.com';
+      }
       
       setDomainInfo({
         zone,
@@ -66,12 +74,12 @@ export function useDomainInfo(): DomainInfo {
     let baseDomain = '';
     let subdomain = '';
 
-    if (currentDomain.includes('eoassist.com')) {
+    if (currentDomain.includes('eoassist.com') || currentDomain.includes('nutroassist.com')) {
       zone = 'com';
-      baseDomain = 'eoassist.com';
-    } else if (currentDomain.includes('eoassist.ru')) {
+      baseDomain = currentDomain.includes('nutroassist.com') ? 'nutroassist.com' : 'eoassist.com';
+    } else if (currentDomain.includes('eoassist.ru') || currentDomain.includes('nutroassist.ru')) {
       zone = 'ru';
-      baseDomain = 'eoassist.ru';
+      baseDomain = currentDomain.includes('nutroassist.ru') ? 'nutroassist.ru' : 'eoassist.ru';
     } else if (currentDomain.includes('eoassist.store')) {
       zone = 'store';
       baseDomain = 'eoassist.store';

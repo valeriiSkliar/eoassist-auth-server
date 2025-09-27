@@ -26,7 +26,7 @@ export const authConfig: NextAuthConfig = {
                 // Проверяем, что originHost - это валидный домен из разрешенных
                 try {
                     const originUrl = new URL(originHost.startsWith('http') ? originHost : `https://${originHost}`);
-                    const allowedDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store'];
+                    const allowedDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store', 'nutroassist.com', 'nutroassist.ru'];
                     const isAllowed = allowedDomains.some(domain => 
                         originUrl.hostname.endsWith(domain)
                     );

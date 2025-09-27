@@ -127,7 +127,12 @@ const intlMiddleware = createIntlMiddleware({
       'https://eoassist.ru', 
       'https://*.eoassist.ru',
       'https://eoassist.store',
-      'https://*.eoassist.store'
+      'https://*.eoassist.store',
+      'https://*.eoassist.com',
+      'https://nutroassist.com',
+      'https://*.nutroassist.com',
+      'https://nutroassist.ru',
+      'https://*.nutroassist.ru',
     ];
     
     const origin = request.headers.get('origin');
