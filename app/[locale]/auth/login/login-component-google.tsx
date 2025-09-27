@@ -1,11 +1,11 @@
 "use client";
 
+import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { FaGoogle } from "react-icons/fa";
 declare module "next-auth" {
   interface User {
@@ -20,21 +20,29 @@ export const LoginWithGoogle = ({
   originHost: string;
   setAuthInProgress: CallableFunction;
 }) => {
-  const serchparams = useSearchParams();
   const { data: session } = useSession();
+  const { sendMessage, originHost: contextOriginHost } = usePostMessages();
 
   const t = useTranslations("signIn");
   const [isPending, startTransition] = useTransition();
   const [isPendingState, setIsPendingState] = useState(false);
 
-  const sendMessage = useCallback(
-    (message: { action: string; key: string; value: any }) => {
-      if (window?.opener) {
-        window?.opener?.postMessage(message, originHost);
+  const resolvedOriginHost = useMemo(() => {
+    if (contextOriginHost) {
+      return contextOriginHost;
+    }
+    if (originHost) {
+      return originHost;
+    }
+    if (typeof document !== "undefined" && document.referrer) {
+      try {
+        return new URL(document.referrer).origin;
+      } catch (error) {
+        return window.location.origin;
       }
-    },
-    [originHost]
-  );
+    }
+    return window.location.origin;
+  }, [contextOriginHost, originHost]);
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -42,17 +50,21 @@ export const LoginWithGoogle = ({
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
     startTransition(async () => {
-      sendMessage({ action: "startLogin", key: "google", value: originHost });
+      sendMessage({
+        action: "startLogin",
+        key: "google",
+        value: resolvedOriginHost,
+      });
       const response = await signIn("google", {
-        redirectTo: originHost,
+        redirectTo: resolvedOriginHost,
       });
     });
   };
   useEffect(() => {
     if (session && window?.opener && session.user?.provider === "google") {
       // Формируем redirectLink на основе originHost
-      const redirectLink = originHost || window.location.origin;
-      
+      const redirectLink = resolvedOriginHost || window.location.origin;
+
       sendMessage({
         action: "login",
         key: "google",
@@ -65,7 +77,7 @@ export const LoginWithGoogle = ({
       sessionStorage.removeItem("ongoingAuth");
       window.close();
     }
-  }, [session, sendMessage, setAuthInProgress, originHost]);
+  }, [session, sendMessage, setAuthInProgress, resolvedOriginHost]);
 
   return (
     <Button

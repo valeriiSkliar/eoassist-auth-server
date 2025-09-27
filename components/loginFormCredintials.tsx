@@ -1,8 +1,7 @@
 "use client";
 import Fonts from "@/lib/fonts/font-cache";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useRef, useTransition, type FC } from "react";
+import { useRef, useMemo, type FC } from "react";
 import { MdAlternateEmail } from "react-icons/md";
 import {
   AgreementCheckbox,
@@ -24,13 +23,29 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
   originHost,
 }) => {
   // const [state, formAction] = useFormState<any, FormData>(credentialsFormAction, undefined);
-  const serchparams = useSearchParams();
-  const { isLoading, error, handleSubmit } = usePostMessages();
-  const [isPending, startTransition] = useTransition();
+  const { isLoading, error, handleSubmit, originHost: contextOriginHost } =
+    usePostMessages();
   const { isAgreed, highlightCheckbox } = useDataAgreement();
   const t = useTranslations("signIn");
 
   const formRef = useRef<HTMLFormElement>(null);
+
+  const resolvedOriginHost = useMemo(() => {
+    if (contextOriginHost) {
+      return contextOriginHost;
+    }
+    if (originHost) {
+      return originHost;
+    }
+    if (typeof document !== "undefined" && document.referrer) {
+      try {
+        return new URL(document.referrer).origin;
+      } catch (error) {
+        return window.location.origin;
+      }
+    }
+    return window.location.origin;
+  }, [contextOriginHost, originHost]);
 
   return (
     <>
@@ -64,7 +79,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
             </Button>
           </ResetPasswordDialog>
         </div>
-        <input type="hidden" name="callbackUrl" value={originHost} />
+        <input type="hidden" name="callbackUrl" value={resolvedOriginHost} />
 
         <AgreementCheckbox />
 

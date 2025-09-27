@@ -1,10 +1,10 @@
 "use client";
 
+import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaYandex } from "react-icons/fa";
 
 export const LoginWithYandex = ({
@@ -14,36 +14,48 @@ export const LoginWithYandex = ({
   originHost: string;
   setAuthInProgress: CallableFunction;
 }) => {
-  const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const { sendMessage, originHost: contextOriginHost } = usePostMessages();
 
   const t = useTranslations("signIn");
   const [isPending, setIsPending] = useState(false);
 
-  const sendMessage = useCallback(
-    (message: { action: string; key: string; value: any }) => {
-      if (window?.opener) {
-        window?.opener?.postMessage(message, originHost);
+  const resolvedOriginHost = useMemo(() => {
+    if (contextOriginHost) {
+      return contextOriginHost;
+    }
+    if (originHost) {
+      return originHost;
+    }
+    if (typeof document !== "undefined" && document.referrer) {
+      try {
+        return new URL(document.referrer).origin;
+      } catch (error) {
+        return window.location.origin;
       }
-    },
-    [originHost]
-  );
+    }
+    return window.location.origin;
+  }, [contextOriginHost, originHost]);
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsPending(true);
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
-    sendMessage({ action: "startLogin", key: "yandex", value: originHost });
-    await signIn("yandex", {
-      redirectTo: `${originHost}/auth/callback/yandex`,
-    });
+    sendMessage({ action: "startLogin", key: "yandex", value: resolvedOriginHost });
+    try {
+      await signIn("yandex", {
+        redirectTo: `${resolvedOriginHost}/auth/callback/yandex`,
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   useEffect(() => {
     if (session && window?.opener && session.user?.provider === "yandex") {
       // Формируем redirectLink на основе originHost
-      const redirectLink = originHost || window.location.origin;
+      const redirectLink = resolvedOriginHost || window.location.origin;
 
       sendMessage({
         action: "login",
@@ -57,7 +69,7 @@ export const LoginWithYandex = ({
       sessionStorage.removeItem("ongoingAuth");
       window.close();
     }
-  }, [session, sendMessage, setAuthInProgress, originHost]);
+  }, [session, sendMessage, setAuthInProgress, resolvedOriginHost]);
 
   return (
     <Button

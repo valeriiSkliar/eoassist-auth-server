@@ -55,11 +55,42 @@ export const usePostMessages = () => {
   return context;
 };
 
+const normalizeOrigin = (value: string | null): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new URL(value).origin;
+  } catch (error) {
+    try {
+      return new URL(`https://${value}`).origin;
+    } catch (innerError) {
+      loger.error("Unable to normalize origin", { value, error, innerError });
+      return null;
+    }
+  }
+};
+
+const resolveCookie = (name: string): string | null => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${name.replace(/([.$?*|{}()\[\]\\\/\+^])/g, "\\$1")}=([^;]*)`)
+  );
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
 const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const serchparams = useSearchParams();
-  const [originHost, setOriginHost] = useState(serchparams.get("originHost"));
+  const searchParamsSerial = serchparams.toString();
+  const [originHost, setOriginHost] = useState<string | null>(() =>
+    normalizeOrigin(serchparams.get("originHost"))
+  );
   const [formState, setFormState] = useState<FormDataType>(initialState);
   const [opener, setOpener] = useState<Window | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,17 +98,70 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [error, setError] = useState<string | null>(null);
   const [isLogInSuccess, setIsLogInSuccess] = useState(false);
 
+  const resolveTargetOrigin = useCallback((): string | null => {
+    const normalizedState = normalizeOrigin(originHost);
+    if (normalizedState) {
+      return normalizedState;
+    }
+
+    try {
+      const openerOrigin = window?.opener?.origin;
+      const normalizedOpener = normalizeOrigin(openerOrigin ?? null);
+      if (normalizedOpener) {
+        return normalizedOpener;
+      }
+    } catch (error) {
+      loger.error("Unable to read opener origin", { error });
+    }
+
+    if (typeof document !== "undefined" && document.referrer) {
+      const referrerOrigin = normalizeOrigin(document.referrer);
+      if (referrerOrigin) {
+        return referrerOrigin;
+      }
+    }
+
+    const cookieOrigin = normalizeOrigin(resolveCookie("origin-host"));
+    if (cookieOrigin) {
+      return cookieOrigin;
+    }
+
+    return null;
+  }, [originHost]);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(searchParamsSerial);
+    const searchOrigin = normalizeOrigin(searchParams.get("originHost"));
+    const targetOrigin = searchOrigin ?? resolveTargetOrigin();
+
+    if (targetOrigin && targetOrigin !== originHost) {
+      setOriginHost(targetOrigin);
+    }
+  }, [searchParamsSerial, resolveTargetOrigin, originHost]);
+
   const setLogInSuccessHandler = (state: boolean) => {
     setIsLogInSuccess(state);
   };
 
   const sendMessageHandler = useCallback(
     (message: MessageDataType) => {
-      if (window?.opener) {
-        window?.opener?.postMessage(message, originHost);
+      if (!window?.opener) {
+        loger.error("postMessage skipped: no opener window", { message });
+        return;
       }
+
+      const targetOrigin = resolveTargetOrigin();
+
+      if (!targetOrigin) {
+        loger.error("postMessage skipped: origin is not resolved", {
+          message,
+        });
+        return;
+      }
+
+      window.opener.postMessage(message, targetOrigin);
     },
-    [originHost]
+    [resolveTargetOrigin]
   );
 
   const credintialsFormSubminHendler = async (form: HTMLFormElement) => {

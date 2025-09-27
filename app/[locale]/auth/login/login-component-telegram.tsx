@@ -1,9 +1,9 @@
 "use client";
+import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaTelegram } from "react-icons/fa";
 export const LoginWithTelegram = ({
   originHost,
@@ -12,21 +12,29 @@ export const LoginWithTelegram = ({
   originHost: string;
   domainZone: string;
 }) => {
-  const serchparams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const { data: session } = useSession();
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations("signIn");
+  const { sendMessage, originHost: contextOriginHost } = usePostMessages();
 
-  const sendMessage = useCallback(
-    (message: { action: string; key: string; value: any }) => {
-      if (window?.opener) {
-        window?.opener?.postMessage(message, originHost);
+  const resolvedOriginHost = useMemo(() => {
+    if (contextOriginHost) {
+      return contextOriginHost;
+    }
+    if (originHost) {
+      return originHost;
+    }
+    if (typeof document !== "undefined" && document.referrer) {
+      try {
+        return new URL(document.referrer).origin;
+      } catch (error) {
+        return window.location.origin;
       }
-    },
-    [originHost]
-  );
+    }
+    return window.location.origin;
+  }, [contextOriginHost, originHost]);
   // const { isAgreed, highlightCheckbox} = useDataAgreement();
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -35,7 +43,7 @@ export const LoginWithTelegram = ({
     //   return;
     // }
     e.preventDefault();
-    if (!originHost) {
+    if (!resolvedOriginHost) {
       sendMessage({
         action: "error",
         key: "originHost",
@@ -44,14 +52,30 @@ export const LoginWithTelegram = ({
         },
       });
     }
-    sendMessage({ action: "startLogin", key: "telegram", value: originHost });
-    const telegramLinkResponse = await fetch(
-      `/api/get-telegram-auth-link?origin=${
-        originHost ?? ""
-      }&domainZone=${domainZone}`
-    ).then((res) => res.json());
-    if (telegramLinkResponse.success) {
-      setTelegramLink(telegramLinkResponse.data);
+    setIsPending(true);
+    try {
+      sendMessage({
+        action: "startLogin",
+        key: "telegram",
+        value: resolvedOriginHost,
+      });
+      const response = await fetch(
+        `/api/get-telegram-auth-link?origin=${encodeURIComponent(
+          resolvedOriginHost
+        )}&domainZone=${domainZone}`
+      );
+      const telegramLinkResponse = await response.json();
+
+      if (telegramLinkResponse.success) {
+        setTelegramLink(telegramLinkResponse.data);
+        setError(null);
+      } else {
+        setError(telegramLinkResponse.error ?? t("errors.general"));
+      }
+    } catch (fetchError) {
+      setError(t("errors.general"));
+    } finally {
+      setIsPending(false);
     }
   };
   useEffect(() => {
@@ -74,7 +98,7 @@ export const LoginWithTelegram = ({
       });
       window.close();
     }
-  }, [session, telegramLink]);
+  }, [session, telegramLink, error, sendMessage]);
   return (
     <Button
       disabled={isPending}

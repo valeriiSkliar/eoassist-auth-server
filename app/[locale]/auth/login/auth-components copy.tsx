@@ -4,6 +4,7 @@ import { useDomainInfo } from "@/hooks/use-domain-info";
 
 import Fonts from "@/lib/fonts/font-cache";
 import React, { useEffect, useRef, useState } from "react";
+import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { LoginWithGoogle } from "./login-component-google";
 import { LoginWithTelegram } from "./login-component-telegram";
 import { LoginWithYandex } from "./login-component-yandex";
@@ -17,6 +18,9 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
   const [optionsIsOpen, setOptionsIsOpen] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
   const authOptionsRef = useRef<HTMLDivElement>(null);
+  const { originHost: contextOriginHost } = usePostMessages();
+
+  const effectiveOriginHost = contextOriginHost ?? originHost;
 
   // Демонстрация работы новой системы определения доменной зоны
   const domainInfo = useDomainInfo();
@@ -69,7 +73,10 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
         </div>
       </div>
 
-      <LoginWithTelegram domainZone={domainInfo.zone} originHost={originHost} />
+      <LoginWithTelegram
+        domainZone={domainInfo.zone}
+        originHost={effectiveOriginHost ?? ""}
+      />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
@@ -98,7 +105,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               {domainInfo.zone === "com" && (
                 <div className="pb-4">
                   <LoginWithGoogle
-                    originHost={originHost}
+                    originHost={effectiveOriginHost ?? ""}
                     setAuthInProgress={setAuthInProgress}
                   />
                 </div>
@@ -108,7 +115,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               {domainInfo.zone === "ru" && (
                 <div className="pb-4">
                   <LoginWithYandex
-                    originHost={originHost}
+                    originHost={effectiveOriginHost ?? ""}
                     setAuthInProgress={setAuthInProgress}
                   />
                 </div>
@@ -119,14 +126,14 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
                 domainInfo.zone === "unknown") && (
                 <div className="pb-4">
                   <LoginWithGoogle
-                    originHost={originHost}
+                    originHost={effectiveOriginHost ?? ""}
                     setAuthInProgress={setAuthInProgress}
                   />
                 </div>
               )}
 
               <div className="pb-4">
-                <LoginFormCredintials originHost={originHost} />
+                <LoginFormCredintials originHost={effectiveOriginHost ?? ""} />
               </div>
               <button
                 onClick={toggleOptions}
