@@ -17,29 +17,69 @@ export const LoginWithTelegram = ({
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("signIn");
-  const { sendMessage, originHost: contextOriginHost } = usePostMessages();
+  const {
+    sendMessage,
+    originHost: contextOriginHost,
+    getResolvedOrigin,
+  } = usePostMessages();
 
-  const resolvedOriginHost = useMemo(() => {
-    if (contextOriginHost) {
-      return contextOriginHost;
+  const sanitizeCandidate = (candidate: string | null | undefined): string | null => {
+    if (!candidate) {
+      return null;
     }
-    if (originHost) {
-      return originHost;
-    }
-    if (typeof document !== "undefined" && document.referrer) {
+
+    const normalize = (value: string): string | null => {
       try {
-        return new URL(document.referrer).origin;
+        return new URL(value).origin;
       } catch (error) {
-        if (typeof window !== "undefined") {
-          return window.location.origin;
+        try {
+          return new URL(`https://${value}`).origin;
+        } catch (innerError) {
+          return null;
         }
       }
+    };
+
+    const normalized = normalize(candidate);
+    if (!normalized) {
+      return null;
     }
+
+    if (typeof window !== "undefined" && normalized === window.location.origin) {
+      return null;
+    }
+
+    return normalized;
+  };
+
+  const resolvedOriginHost = useMemo(() => {
+    const candidates: Array<string | null | undefined> = [
+      getResolvedOrigin(),
+      contextOriginHost,
+      originHost,
+    ];
+
+    if (typeof document !== "undefined") {
+      candidates.push(document.referrer);
+    }
+
     if (typeof window !== "undefined") {
-      return window.location.origin;
+      try {
+        candidates.push(sessionStorage.getItem("eoassist-parent-origin"));
+      } catch (error) {
+        // Ignore storage access issues
+      }
     }
+
+    for (const candidate of candidates) {
+      const sanitized = sanitizeCandidate(candidate);
+      if (sanitized) {
+        return sanitized;
+      }
+    }
+
     return null;
-  }, [contextOriginHost, originHost]);
+  }, [getResolvedOrigin, contextOriginHost, originHost]);
   // const { isAgreed, highlightCheckbox} = useDataAgreement();
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,7 +88,7 @@ export const LoginWithTelegram = ({
     //   return;
     // }
     e.preventDefault();
-    if (!resolvedOriginHost && typeof window === "undefined") {
+    if (!resolvedOriginHost) {
       sendMessage({
         action: "error",
         key: "originHost",
@@ -56,12 +96,11 @@ export const LoginWithTelegram = ({
           message: t("errors.originHostNotDefined"),
         },
       });
+      return;
     }
     setIsPending(true);
     try {
-      const targetOrigin =
-        resolvedOriginHost ??
-        (typeof window !== "undefined" ? window.location.origin : "");
+      const targetOrigin = resolvedOriginHost;
       sendMessage({
         action: "startLogin",
         key: "telegram",
@@ -69,7 +108,7 @@ export const LoginWithTelegram = ({
       });
       const response = await fetch(
         `/api/get-telegram-auth-link?origin=${encodeURIComponent(
-          targetOrigin ?? ""
+          targetOrigin
         )}&domainZone=${domainZone}`
       );
       const telegramLinkResponse = await response.json();

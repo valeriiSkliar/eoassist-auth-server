@@ -39,6 +39,7 @@ interface PostMessagesContextType {
   sendMessage: (message: MessageDataType) => void;
   setIsLoading: (value: boolean) => void;
   handleSubmit: (form: HTMLFormElement) => Promise<void>;
+  getResolvedOrigin: () => string | null;
 }
 
 const PostMessagesContext = createContext<PostMessagesContextType | undefined>(
@@ -82,14 +83,75 @@ const resolveCookie = (name: string): string | null => {
   );
   return match ? decodeURIComponent(match[1]) : null;
 };
+const getCurrentWindowOrigin = (): string | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.location.origin;
+};
+
+const isSameAsCurrentOrigin = (value: string | null): boolean => {
+  const current = getCurrentWindowOrigin();
+  if (!value || !current) {
+    return false;
+  }
+
+  return value === current;
+};
+
+const sanitizeOrigin = (value: string | null): string | null => {
+  const normalized = normalizeOrigin(value);
+  if (!normalized) {
+    return null;
+  }
+
+  if (isSameAsCurrentOrigin(normalized)) {
+    return null;
+  }
+
+  return normalized;
+};
+
+const ORIGIN_STORAGE_KEY = "eoassist-parent-origin";
+
+const readStoredOrigin = (): string | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return sessionStorage.getItem(ORIGIN_STORAGE_KEY);
+  } catch (error) {
+    loger.error("Unable to read stored origin", { error });
+    return null;
+  }
+};
+
+const persistOrigin = (value: string | null) => {
+  if (!value || typeof window === "undefined") {
+    return;
+  }
+
+  if (isSameAsCurrentOrigin(value)) {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(ORIGIN_STORAGE_KEY, value);
+  } catch (error) {
+    loger.error("Unable to persist origin", { error });
+  }
+};
 
 const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const serchparams = useSearchParams();
   const searchParamsSerial = serchparams.toString();
-  const [originHost, setOriginHost] = useState<string | null>(() =>
-    normalizeOrigin(serchparams.get("originHost"))
+  const initialSearchOrigin = sanitizeOrigin(serchparams.get("originHost"));
+  const [originHost, setOriginHost] = useState<string | null>(
+    initialSearchOrigin ?? sanitizeOrigin(readStoredOrigin())
   );
   const [formState, setFormState] = useState<FormDataType>(initialState);
   const [opener, setOpener] = useState<Window | null>(null);
@@ -99,37 +161,29 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLogInSuccess, setIsLogInSuccess] = useState(false);
 
   const resolveTargetOrigin = useCallback((): string | null => {
-    const normalizedState = normalizeOrigin(originHost);
-    if (normalizedState) {
-      return normalizedState;
-    }
+    const candidates: Array<string | null> = [originHost];
 
     if (typeof window !== "undefined") {
       try {
-        const openerOrigin = window.opener?.origin ?? null;
-        const normalizedOpener = normalizeOrigin(openerOrigin);
-        if (normalizedOpener) {
-          return normalizedOpener;
-        }
+        candidates.push(window.opener?.origin ?? null);
       } catch (error) {
         loger.error("Unable to read opener origin", { error });
       }
     }
 
     if (typeof document !== "undefined" && document.referrer) {
-      const referrerOrigin = normalizeOrigin(document.referrer);
-      if (referrerOrigin) {
-        return referrerOrigin;
+      candidates.push(document.referrer);
+    }
+
+    candidates.push(resolveCookie("origin-host"));
+    candidates.push(readStoredOrigin());
+
+    for (const candidate of candidates) {
+      const sanitized = sanitizeOrigin(candidate);
+      if (sanitized) {
+        persistOrigin(sanitized);
+        return sanitized;
       }
-    }
-
-    const cookieOrigin = normalizeOrigin(resolveCookie("origin-host"));
-    if (cookieOrigin) {
-      return cookieOrigin;
-    }
-
-    if (typeof window !== "undefined") {
-      return normalizeOrigin(window.location.origin);
     }
 
     return null;
@@ -137,11 +191,12 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const searchParams = new URLSearchParams(searchParamsSerial);
-    const searchOrigin = normalizeOrigin(searchParams.get("originHost"));
+    const searchOrigin = sanitizeOrigin(searchParams.get("originHost"));
     const targetOrigin = searchOrigin ?? resolveTargetOrigin();
 
     if (targetOrigin && targetOrigin !== originHost) {
       setOriginHost(targetOrigin);
+      persistOrigin(targetOrigin);
     }
   }, [searchParamsSerial, resolveTargetOrigin, originHost]);
 
@@ -175,11 +230,8 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     const callbackUrl = formData.get("callbackUrl")?.toString() ?? "";
 
     // Используем callbackUrl (который содержит originHost) как redirectLink
-    const fallbackOrigin =
-      originHost ||
-      (typeof window !== "undefined" ? window.location.origin : "");
-
-    const redirectLink = callbackUrl || fallbackOrigin;
+    const resolvedOrigin = resolveTargetOrigin();
+    const redirectLink = callbackUrl || resolvedOrigin || "";
 
     setFormState({
       // values: {
@@ -209,6 +261,12 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const handleParentMessages = (e: MessageEvent) => {
+    const messageOrigin = sanitizeOrigin(e.origin);
+    if (messageOrigin && messageOrigin !== originHost) {
+      setOriginHost(messageOrigin);
+      persistOrigin(messageOrigin);
+    }
+
     const { action, key, value } = e.data;
     if (action === "start-answer") {
       setIsLoadingHendler(true);
@@ -280,6 +338,7 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         sendMessage: sendMessageHandler,
         setIsLoading: setIsLoadingHendler,
         handleSubmit: credintialsFormSubminHendler,
+        getResolvedOrigin: resolveTargetOrigin,
       }}
     >
       {children}
