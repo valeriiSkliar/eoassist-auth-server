@@ -4,6 +4,34 @@ import Yandex from "next-auth/providers/yandex";
 import { Env } from "./lib/Env";
 import { loger } from './lib/console-loger';
 
+const AUTH_BASE_PATH = '/api/auth';
+
+const yandexRedirectProxyUrl = (() => {
+  const ensureBasePath = (url: string) => {
+    const normalized = url.replace(/\/$/, '');
+    return normalized.endsWith(AUTH_BASE_PATH)
+      ? normalized
+      : `${normalized}${AUTH_BASE_PATH}`;
+  };
+
+  if (Env.NEXTAUTH_URL_RU) {
+    return ensureBasePath(Env.NEXTAUTH_URL_RU);
+  }
+
+  const mappings: Array<[string, string]> = [
+    ['nutrioassist.com', 'nutrioassist.ru'],
+    ['eoassist.com', 'eoassist.ru'],
+  ];
+
+  for (const [from, to] of mappings) {
+    if (Env.NEXTAUTH_URL.includes(from)) {
+      return ensureBasePath(Env.NEXTAUTH_URL.replace(from, to));
+    }
+  }
+
+  return undefined;
+})();
+
 declare module 'next-auth' {
   interface Session {
     provider: string;
@@ -104,10 +132,11 @@ export const authConfig: NextAuthConfig = {
       }
     }),
     Yandex({
-      clientId: Env.YANDEX_CLIENT_ID,
-      clientSecret: Env.YANDEX_CLIENT_SECRET,
+      clientId: Env.YANDEX_CLIENT_ID_RU ?? Env.YANDEX_CLIENT_ID,
+      clientSecret: Env.YANDEX_CLIENT_SECRET_RU ?? Env.YANDEX_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
       checks: ['pkce'],
+      redirectProxyUrl: yandexRedirectProxyUrl,
 
       async profile (profile) {         
         if (profile) {
