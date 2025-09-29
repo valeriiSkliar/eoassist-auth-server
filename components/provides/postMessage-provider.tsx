@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -116,6 +117,10 @@ const sanitizeOrigin = (value: string | null): string | null => {
 const ORIGIN_STORAGE_KEY = "eoassist-parent-origin";
 let hasWarnedAboutOpenerOrigin = false;
 
+const ORIGIN_REQUEST_EVENT = "provide-origin";
+const ORIGIN_REQUEST_MESSAGE = "request-origin";
+const ORIGIN_HANDSHAKE_TIMEOUT = 1000;
+
 const safeGetOpenerOrigin = (): string | null => {
   if (typeof window === "undefined" || !window.opener) {
     return null;
@@ -188,6 +193,48 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [close, setClose] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLogInSuccess, setIsLogInSuccess] = useState(false);
+  const originHandshakeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const requestOpenerOrigin = useCallback(() => {
+    if (typeof window === "undefined" || !window.opener) {
+      return;
+    }
+
+    try {
+      window.opener.postMessage(
+        {
+          action: ORIGIN_REQUEST_MESSAGE,
+          key: "post-messages-provider",
+        },
+        "*"
+      );
+    } catch (error) {
+      loger.error("Failed to request opener origin", { error });
+    }
+  }, []);
+
+  const ensureOriginHandshake = useCallback(() => {
+    if (
+      originHandshakeTimerRef.current ||
+      originHost ||
+      typeof window === "undefined" ||
+      !window.opener
+    ) {
+      return;
+    }
+
+    requestOpenerOrigin();
+    originHandshakeTimerRef.current = setInterval(() => {
+      requestOpenerOrigin();
+    }, ORIGIN_HANDSHAKE_TIMEOUT);
+  }, [originHost, requestOpenerOrigin]);
+
+  const stopOriginHandshake = useCallback(() => {
+    if (originHandshakeTimerRef.current) {
+      clearInterval(originHandshakeTimerRef.current);
+      originHandshakeTimerRef.current = null;
+    }
+  }, []);
 
   const resolveTargetOrigin = useCallback((): string | null => {
     const candidates: Array<string | null> = [originHost];
@@ -214,8 +261,9 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
 
+    ensureOriginHandshake();
     return null;
-  }, [originHost]);
+  }, [originHost, ensureOriginHandshake]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(searchParamsSerial);
@@ -223,10 +271,19 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     const targetOrigin = searchOrigin ?? resolveTargetOrigin();
 
     if (targetOrigin && targetOrigin !== originHost) {
+      stopOriginHandshake();
       setOriginHost(targetOrigin);
       persistOrigin(targetOrigin);
+    } else if (!targetOrigin) {
+      ensureOriginHandshake();
     }
-  }, [searchParamsSerial, resolveTargetOrigin, originHost]);
+  }, [
+    searchParamsSerial,
+    resolveTargetOrigin,
+    originHost,
+    ensureOriginHandshake,
+    stopOriginHandshake,
+  ]);
 
   const setLogInSuccessHandler = (state: boolean) => {
     setIsLogInSuccess(state);
@@ -291,11 +348,39 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleParentMessages = (e: MessageEvent) => {
     const messageOrigin = sanitizeOrigin(e.origin);
     if (messageOrigin && messageOrigin !== originHost) {
+      stopOriginHandshake();
       setOriginHost(messageOrigin);
       persistOrigin(messageOrigin);
     }
 
     const { action, key, value } = e.data;
+    if (action === ORIGIN_REQUEST_MESSAGE) {
+      if (e.source && typeof window !== "undefined") {
+        try {
+          (e.source as WindowProxy).postMessage(
+            {
+              action: ORIGIN_REQUEST_EVENT,
+              key: "post-messages-provider",
+              value: window.location.origin,
+            },
+            messageOrigin || "*"
+          );
+        } catch (error) {
+          loger.error("Failed to respond with origin", { error });
+        }
+      }
+      return;
+    }
+
+    if (action === ORIGIN_REQUEST_EVENT && typeof value === "string") {
+      const providedOrigin = sanitizeOrigin(value);
+      if (providedOrigin) {
+        stopOriginHandshake();
+        setOriginHost(providedOrigin);
+        persistOrigin(providedOrigin);
+      }
+      return;
+    }
     if (action === "start-answer") {
       setIsLoadingHendler(true);
       sendMessageHandler({
@@ -346,11 +431,14 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         window.close();
       }
 
-      return () => window.removeEventListener("message", handleParentMessages);
+      return () => {
+        stopOriginHandshake();
+        window.removeEventListener("message", handleParentMessages);
+      };
     }
 
     return () => undefined;
-  }, [originHost, close]);
+  }, [originHost, close, stopOriginHandshake]);
 
   return (
     <PostMessagesContext.Provider
