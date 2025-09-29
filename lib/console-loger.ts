@@ -41,6 +41,10 @@ export const loger = {
       ...rest,
     );
   },
+  warn: function warn(text = 'Warning', ...rest: unknown[]) {
+    const color = colors.fg.black + colors.bg.yellow;
+    console.warn(`${color} ⚠️ ${text} ${colors.reset}`, ...rest);
+  },
   error: function error(text = 'Error', ...rest: unknown[]) {
     const color = colors.fg.white + colors.bg.red;
     console.error(`${color} \u26A0\uFE0F ${text} ${colors.reset}`, ...rest);

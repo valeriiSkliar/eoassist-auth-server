@@ -114,6 +114,35 @@ const sanitizeOrigin = (value: string | null): string | null => {
 };
 
 const ORIGIN_STORAGE_KEY = "eoassist-parent-origin";
+let hasWarnedAboutOpenerOrigin = false;
+
+const safeGetOpenerOrigin = (): string | null => {
+  if (typeof window === "undefined" || !window.opener) {
+    return null;
+  }
+
+  try {
+    return window.opener.origin;
+  } catch (error) {
+    const isSecurityError =
+      typeof DOMException !== "undefined" &&
+      error instanceof DOMException &&
+      error.name === "SecurityError";
+
+    if (isSecurityError) {
+      if (!hasWarnedAboutOpenerOrigin) {
+        hasWarnedAboutOpenerOrigin = true;
+        loger.warn(
+          "Unable to access window.opener.origin due to cross-origin restrictions"
+        );
+      }
+      return null;
+    }
+
+    loger.error("Unable to read opener origin", { error });
+    return null;
+  }
+};
 
 const readStoredOrigin = (): string | null => {
   if (typeof window === "undefined") {
@@ -164,10 +193,9 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     const candidates: Array<string | null> = [originHost];
 
     if (typeof window !== "undefined") {
-      try {
-        candidates.push(window.opener?.origin ?? null);
-      } catch (error) {
-        loger.error("Unable to read opener origin", { error });
+      const openerOrigin = safeGetOpenerOrigin();
+      if (openerOrigin) {
+        candidates.push(openerOrigin);
       }
     }
 
