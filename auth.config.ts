@@ -67,12 +67,37 @@ export const authConfig: NextAuthConfig = {
                 }
             }
             
-            // Если URL начинается с baseUrl, используем baseUrl
-            if (url.startsWith(baseUrl)) return baseUrl;
+            // Если URL начинается с baseUrl, используем baseUrl (с учетом ruProxyHost)
+            if (url.startsWith(baseUrl)) {
+                const ruProxyHost = (globalThis as any)?.__NEXT_PRIVATE_PROXY_HOST as string | undefined;
+                if (ruProxyHost) {
+                    try {
+                        const normalizedUrl = new URL(baseUrl);
+                        const isSameHost = normalizedUrl.hostname === ruProxyHost;
+                        const isMappedHost = ['nutrioassist.com', 'eoassist.com'].some(domain =>
+                            normalizedUrl.hostname.endsWith(domain)
+                        );
+
+                        if (!isSameHost && isMappedHost) {
+                            normalizedUrl.hostname = ruProxyHost;
+                            normalizedUrl.protocol = 'https:';
+                            return normalizedUrl.toString();
+                        }
+                    } catch (error) {
+                        loger.error('Failed to normalize baseUrl for ruProxyHost', { baseUrl, ruProxyHost, error });
+                    }
+                }
+
+                return baseUrl;
+            }
             
             // В остальных случаях добавляем originHost параметр
             const baseWithOriginHost = new URL(baseUrl);
             baseWithOriginHost.searchParams.set('originHost', url);
+            const ruProxyHost = (globalThis as any)?.__NEXT_PRIVATE_PROXY_HOST as string | undefined;
+            if (ruProxyHost) {
+                baseWithOriginHost.searchParams.set('ruProxyHost', ruProxyHost);
+            }
             return baseWithOriginHost.toString();
         },
         async session({ session, user, token }) {
