@@ -32,6 +32,68 @@ const yandexRedirectProxyUrl = (() => {
   return undefined;
 })();
 
+const ALLOWED_BASE_DOMAINS = ['eoassist.com', 'eoassist.ru', 'eoassist.store', 'nutroassist.com', 'nutroassist.ru'];
+
+const DOMAIN_MAPPINGS = [
+  { source: 'nutrioassist.com', target: 'nutrioassist.ru' },
+  { source: 'eoassist.com', target: 'eoassist.ru' },
+];
+
+const sanitizeHost = (value: string | null | undefined): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim().toLowerCase();
+  if (!trimmed) {
+    return null;
+  }
+
+  const sanitized = trimmed.replace(/[^a-z0-9.-]/g, '');
+  if (!sanitized) {
+    return null;
+  }
+
+  return sanitized;
+};
+
+const isAllowedDomain = (host: string | null | undefined): host is string => {
+  const sanitizedHost = sanitizeHost(host);
+  if (!sanitizedHost) {
+    return false;
+  }
+
+  return ALLOWED_BASE_DOMAINS.some(domain => sanitizedHost === domain || sanitizedHost.endsWith(`.${domain}`));
+};
+
+const resolveProxyHost = (origin: URL): string | null => {
+  const hostFromSearch = sanitizeHost(origin.searchParams.get('ruProxyHost'));
+  if (hostFromSearch && isAllowedDomain(hostFromSearch)) {
+    return hostFromSearch;
+  }
+
+  const globalHost = sanitizeHost((globalThis as any)?.__NEXT_PRIVATE_PROXY_HOST as string | undefined);
+  if (globalHost && isAllowedDomain(globalHost)) {
+    return globalHost;
+  }
+
+  return null;
+};
+
+const shouldUseProxyHost = (currentHost: string, proxyHost: string): boolean => {
+  if (currentHost === proxyHost) {
+    return false;
+  }
+
+  if (!isAllowedDomain(proxyHost)) {
+    return false;
+  }
+
+  return DOMAIN_MAPPINGS.some(({ source, target }) =>
+    currentHost.endsWith(source) && proxyHost.endsWith(target)
+  );
+};
+
 declare module 'next-auth' {
   interface Session {
     provider: string;
@@ -54,12 +116,7 @@ export const authConfig: NextAuthConfig = {
                 // Проверяем, что originHost - это валидный домен из разрешенных
                 try {
                     const originUrl = new URL(originHost.startsWith('http') ? originHost : `https://${originHost}`);
-                    const allowedDomains = ['eoassist.com', 'eoassist.ru', 'eoassist.store', 'nutroassist.com', 'nutroassist.ru'];
-                    const isAllowed = allowedDomains.some(domain => 
-                        originUrl.hostname.endsWith(domain)
-                    );
-
-                    if (isAllowed) {
+                    if (isAllowedDomain(originUrl.hostname)) {
                         return originUrl.toString();
                     }
                 } catch (e) {
@@ -67,36 +124,30 @@ export const authConfig: NextAuthConfig = {
                 }
             }
             
+            const proxyHost = resolveProxyHost(origin);
+
             // Если URL начинается с baseUrl, используем baseUrl (с учетом ruProxyHost)
             if (url.startsWith(baseUrl)) {
-                const ruProxyHost = (globalThis as any)?.__NEXT_PRIVATE_PROXY_HOST as string | undefined;
-                if (ruProxyHost) {
-                    try {
-                        const normalizedUrl = new URL(baseUrl);
-                        const isSameHost = normalizedUrl.hostname === ruProxyHost;
-                        const isMappedHost = ['nutrioassist.com', 'eoassist.com'].some(domain =>
-                            normalizedUrl.hostname.endsWith(domain)
-                        );
-
-                        if (!isSameHost && isMappedHost) {
-                            normalizedUrl.hostname = ruProxyHost;
-                            normalizedUrl.protocol = 'https:';
-                            return normalizedUrl.toString();
-                        }
-                    } catch (error) {
-                        loger.error('Failed to normalize baseUrl for ruProxyHost', { baseUrl, ruProxyHost, error });
+                try {
+                    const normalizedUrl = new URL(baseUrl);
+                    if (proxyHost && shouldUseProxyHost(normalizedUrl.hostname, proxyHost)) {
+                        normalizedUrl.hostname = proxyHost;
+                        normalizedUrl.protocol = 'https:';
+                        normalizedUrl.port = '';
+                        return normalizedUrl.toString();
                     }
+                    return baseUrl;
+                } catch (error) {
+                    loger.error('Failed to normalize baseUrl for redirect', { baseUrl, proxyHost, error });
+                    return baseUrl;
                 }
-
-                return baseUrl;
             }
             
             // В остальных случаях добавляем originHost параметр
             const baseWithOriginHost = new URL(baseUrl);
             baseWithOriginHost.searchParams.set('originHost', url);
-            const ruProxyHost = (globalThis as any)?.__NEXT_PRIVATE_PROXY_HOST as string | undefined;
-            if (ruProxyHost) {
-                baseWithOriginHost.searchParams.set('ruProxyHost', ruProxyHost);
+            if (proxyHost) {
+                baseWithOriginHost.searchParams.set('ruProxyHost', proxyHost);
             }
             return baseWithOriginHost.toString();
         },
