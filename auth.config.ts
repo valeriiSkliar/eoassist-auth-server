@@ -50,7 +50,7 @@ export const authConfig: NextAuthConfig = {
             // Если есть originHost параметр, сохраняем его
             if (origin.searchParams.has('originHost')) {
                 const originHost = origin.searchParams.get('originHost')!;
-                
+
                 // Проверяем, что originHost - это валидный домен из разрешенных
                 try {
                     const originUrl = new URL(originHost.startsWith('http') ? originHost : `https://${originHost}`);
@@ -58,10 +58,9 @@ export const authConfig: NextAuthConfig = {
                     const isAllowed = allowedDomains.some(domain => 
                         originUrl.hostname.endsWith(domain)
                     );
-                    
+
                     if (isAllowed) {
-                        // Сохраняем originHost в URL для последующего использования
-                        return origin.toString();
+                        return originUrl.toString();
                     }
                 } catch (e) {
                     loger.info('Invalid originHost', { originHost, error: e });
