@@ -115,6 +115,7 @@ const sanitizeOrigin = (value: string | null): string | null => {
 };
 
 const ORIGIN_STORAGE_KEY = "eoassist-parent-origin";
+const AUTH_HOST_STORAGE_KEY = "eoassist-auth-host";
 let hasWarnedAboutOpenerOrigin = false;
 
 const ORIGIN_REQUEST_EVENT = "provide-origin";
@@ -178,12 +179,67 @@ const persistOrigin = (value: string | null) => {
   }
 };
 
+const readStoredAuthHost = (): string | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return sessionStorage.getItem(AUTH_HOST_STORAGE_KEY);
+  } catch (error) {
+    loger.error("Unable to read stored auth host", { error });
+    return null;
+  }
+};
+
+const persistAuthHost = (value: string | null) => {
+  if (!value || typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(AUTH_HOST_STORAGE_KEY, value);
+  } catch (error) {
+    loger.error("Unable to persist auth host", { error });
+  }
+};
+
+const shouldRedirectToStoredHost = (desiredHost: string, currentHost: string) => {
+  if (desiredHost === currentHost) {
+    return false;
+  }
+
+  const mappings: Array<[string, string]> = [
+    ["nutrioassist.ru", "nutrioassist.com"],
+    ["eoassist.ru", "eoassist.com"],
+  ];
+
+  return mappings.some(([target, source]) =>
+    desiredHost.endsWith(target) && currentHost.endsWith(source)
+  );
+};
+
+const sanitizeHost = (value: string | null): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim().toLowerCase();
+  const sanitized = trimmed.replace(/[^a-z0-9.-]/g, "");
+  if (!sanitized) {
+    return null;
+  }
+
+  return sanitized;
+};
+
 const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const serchparams = useSearchParams();
   const searchParamsSerial = serchparams.toString();
   const initialSearchOrigin = sanitizeOrigin(serchparams.get("originHost"));
+  const initialRuProxyHost = sanitizeHost(serchparams.get("ruProxyHost"));
   const [originHost, setOriginHost] = useState<string | null>(
     initialSearchOrigin ?? sanitizeOrigin(readStoredOrigin())
   );
@@ -268,6 +324,12 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const searchParams = new URLSearchParams(searchParamsSerial);
     const searchOrigin = sanitizeOrigin(searchParams.get("originHost"));
+    const searchRuProxyHost = sanitizeHost(searchParams.get("ruProxyHost"));
+
+    if (searchRuProxyHost) {
+      persistAuthHost(searchRuProxyHost);
+    }
+
     const targetOrigin = searchOrigin ?? resolveTargetOrigin();
 
     if (targetOrigin && targetOrigin !== originHost) {
@@ -284,6 +346,25 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     ensureOriginHandshake,
     stopOriginHandshake,
   ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!readStoredAuthHost()) {
+      persistAuthHost(window.location.host);
+    }
+
+    const desiredHost = readStoredAuthHost();
+    if (
+      desiredHost &&
+      shouldRedirectToStoredHost(desiredHost, window.location.host)
+    ) {
+      const targetUrl = `${window.location.protocol}//${desiredHost}${window.location.pathname}${window.location.search}`;
+      window.location.replace(targetUrl);
+    }
+  }, [initialRuProxyHost, searchParamsSerial]);
 
   const setLogInSuccessHandler = (state: boolean) => {
     setIsLogInSuccess(state);
