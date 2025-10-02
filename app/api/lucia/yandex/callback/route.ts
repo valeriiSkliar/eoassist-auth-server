@@ -176,6 +176,13 @@ export async function GET(request: NextRequest) {
             name: user.name,
             image: user.image,
           },
+          profile: {
+            oauthId: profile.oauthId,
+            email: profile.email,
+            name: profile.name,
+            image: profile.image,
+          },
+          oauthId: profile.oauthId,
           redirectLink,
         },
       },
