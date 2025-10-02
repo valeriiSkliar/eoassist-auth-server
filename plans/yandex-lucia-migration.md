@@ -56,6 +56,7 @@
 
 - Document how Lucia handlers access globals set by middleware: `__DOMAIN_INFO`, `__NEXT_PRIVATE_PROXY_HOST`, `referal-domain` cookie.
 - Provide helper to read these values on the server (shared util or direct access).
+ - ✅ Added `lib/middleware-globals.ts` exposing `getMiddlewareContext`, `getProxyHost`, `getDomainInfo`, and `getReferalDomain` for reuse.
 
 3. **Implement Yandex OAuth via Lucia**
 
@@ -63,6 +64,7 @@
    - Implement token exchange and user normalization compatible with existing session schema (id/email/avatar) and set `provider: 'yandex'` in user attributes.
    - Reuse RU proxy helpers (`resolveProxyHost`, `shouldUseProxyHost`) to compute final redirect targets when necessary.
    - Ensure Lucia produces a session/cookie accessible to the client, matching domain + security flags.
+   - ✅ Added `lib/oauth/yandex.ts` with authorization URL generation, RU-only validation, token exchange, profile normalization, Prisma upsert, and Lucia session helper leveraging proxy utilities.
 
 4. **Add Lucia Routes/Handlers**
 

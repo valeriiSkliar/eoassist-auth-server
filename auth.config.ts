@@ -39,7 +39,7 @@ const DOMAIN_MAPPINGS = [
   { source: 'eoassist.com', target: 'eoassist.ru' },
 ];
 
-const sanitizeHost = (value: string | null | undefined): string | null => {
+export const sanitizeHost = (value: string | null | undefined): string | null => {
   if (!value) {
     return null;
   }
@@ -57,7 +57,7 @@ const sanitizeHost = (value: string | null | undefined): string | null => {
   return sanitized;
 };
 
-const isAllowedDomain = (host: string | null | undefined): host is string => {
+export const isAllowedDomain = (host: string | null | undefined): host is string => {
   const sanitizedHost = sanitizeHost(host);
   if (!sanitizedHost) {
     return false;
@@ -66,7 +66,7 @@ const isAllowedDomain = (host: string | null | undefined): host is string => {
   return ALLOWED_BASE_DOMAINS.some(domain => sanitizedHost === domain || sanitizedHost.endsWith(`.${domain}`));
 };
 
-const resolveProxyHost = (origin: URL): string | null => {
+export const resolveProxyHost = (origin: URL): string | null => {
   const hostFromSearch = sanitizeHost(origin.searchParams.get('ruProxyHost'));
   if (hostFromSearch && isAllowedDomain(hostFromSearch)) {
     return hostFromSearch;
@@ -80,7 +80,7 @@ const resolveProxyHost = (origin: URL): string | null => {
   return null;
 };
 
-const shouldUseProxyHost = (currentHost: string, proxyHost: string): boolean => {
+export const shouldUseProxyHost = (currentHost: string, proxyHost: string): boolean => {
   if (currentHost === proxyHost) {
     return false;
   }
