@@ -59,7 +59,10 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
       {lastLogin && lastLogin.provider === "yandex" && (
         <div className="rounded-md border border-green-500 bg-green-50 p-3 text-sm text-green-900 flex items-center justify-between">
           <span>
-            ✅ Yandex login succeeded{lastLogin.payload?.user?.email ? ` (${lastLogin.payload.user.email})` : ""}
+            ✅ Yandex login succeeded
+            {lastLogin.payload?.user?.email
+              ? ` (${lastLogin.payload.user.email})`
+              : ""}
           </span>
           <button
             type="button"
@@ -71,8 +74,8 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
         </div>
       )}
       {/* Индикатор зоны и доступных методов авторизации */}
-      <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
-        {/* <div>
+      {/* <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+        <div>
           <strong>Зона:</strong> {domainInfo.zone} |<strong> Домен:</strong>{" "}
           {domainInfo.fullDomain} |<strong> Базовый:</strong>{" "}
           {domainInfo.baseDomain}
@@ -82,7 +85,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               | <strong>Поддомен:</strong> {domainInfo.subdomain}
             </span>
           )}
-        </div> */}
+        </div>
         <div className="mt-1">
           <strong>Доступные методы:</strong> Telegram, Email +
           {domainInfo.zone === "com" && " Google"}
@@ -90,7 +93,7 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
           {(domainInfo.zone === "store" || domainInfo.zone === "unknown") &&
             " Google (по умолчанию)"}
         </div>
-      </div>
+      </div> */}
 
       <LoginWithTelegram
         domainZone={domainInfo.zone}
@@ -131,12 +134,14 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
               )}
 
               {/* Yandex авторизация */}
-              <div className="pb-4">
-                <LoginWithYandex
-                  originHost={effectiveOriginHost ?? ""}
-                  setAuthInProgress={setAuthInProgress}
-                />
-              </div>
+              {domainInfo.zone === "ru" && (
+                <div className="pb-4">
+                  <LoginWithYandex
+                    originHost={effectiveOriginHost ?? ""}
+                    setAuthInProgress={setAuthInProgress}
+                  />
+                </div>
+              )}
 
               {/* Для зоны STORE или UNKNOWN показываем Google по умолчанию */}
               {(domainInfo.zone === "store" ||
