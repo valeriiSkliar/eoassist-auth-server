@@ -2,9 +2,8 @@
 
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
-import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FaYandex } from "react-icons/fa";
 
 export const LoginWithYandex = ({
@@ -14,7 +13,6 @@ export const LoginWithYandex = ({
   originHost: string;
   setAuthInProgress: CallableFunction;
 }) => {
-  const { data: session } = useSession();
   const {
     sendMessage,
     originHost: contextOriginHost,
@@ -90,39 +88,42 @@ export const LoginWithYandex = ({
     const targetOrigin = resolvedOriginHost ?? null;
     sendMessage({ action: "startLogin", key: "yandex", value: targetOrigin });
     try {
-      const redirectOptions = targetOrigin
-        ? {
-            redirectTo: `${targetOrigin}/auth/callback/yandex`,
-          }
-        : undefined;
-      await signIn("yandex", redirectOptions);
+      const searchParams = new URLSearchParams();
+      if (targetOrigin) {
+        searchParams.set("originHost", targetOrigin);
+      }
+
+      const response = await fetch(
+        `/api/lucia/yandex/login${searchParams.size ? `?${searchParams.toString()}` : ""}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const errorPayload = await response.json().catch(() => ({ error: "Request failed" }));
+        const message = errorPayload?.error ?? t("errors.general");
+        throw new Error(message);
+      }
+
+      const data = (await response.json()) as { authorizationUrl?: string };
+      if (!data?.authorizationUrl) {
+        throw new Error("Authorization URL is missing");
+      }
+
+      window.location.assign(data.authorizationUrl);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t("errors.general");
+      sendMessage({
+        action: "error",
+        key: "yandex",
+        value: { message },
+      });
+      setAuthInProgress(false);
     } finally {
       setIsPending(false);
     }
   };
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-    if (session && window?.opener && session.user?.provider === "yandex") {
-      // Формируем redirectLink на основе originHost
-      const redirectLink =
-        resolvedOriginHost || window.location.origin;
-
-      sendMessage({
-        action: "login",
-        key: "yandex",
-        value: {
-          ...session.user,
-          redirectLink: redirectLink, // Добавляем redirectLink для правильного редиректа
-        },
-      });
-      setAuthInProgress(false);
-      sessionStorage.removeItem("ongoingAuth");
-      window.close();
-    }
-  }, [session, sendMessage, setAuthInProgress, resolvedOriginHost]);
 
   return (
     <Button

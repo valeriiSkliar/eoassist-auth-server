@@ -85,6 +85,7 @@
    - Ensure Lucia session/user payload exposes `provider: 'yandex'` so `session.user.provider === 'yandex'` checks continue to work (declare in `lib/lucia.ts`).
    - Keep Google/Telegram logic untouched; all UI remains identical.
    - Propagate redirect URL and originHost handling through the new endpoints.
+   - ✅ `login-component-yandex.tsx` now calls `/api/lucia/yandex/login`, handles errors locally, and relies on Lucia callback for success messaging.
 
 6. **Session Harmonization**
 
