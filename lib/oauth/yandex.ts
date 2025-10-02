@@ -4,6 +4,7 @@ import { resolveProxyHost, shouldUseProxyHost } from "@/auth.config";
 import { Env } from "@/lib/Env";
 import prisma from "@/lib/prisma";
 import { lucia } from "@/lib/lucia";
+import { loger } from "@/lib/console-loger";
 import type { MiddlewareContext } from "@/lib/middleware-globals";
 import type { Session } from "lucia";
 
@@ -140,6 +141,9 @@ export const exchangeYandexAuthorizationCode = async (
   const accessToken = tokens.accessToken();
   const profile = await fetchYandexProfile(accessToken);
   const normalized = normalizeYandexProfile(profile);
+  loger.info("Yandex OAuth exchange completed", {
+    profile: normalized,
+  });
   return { tokens, profile: normalized };
 };
 
@@ -153,7 +157,9 @@ const fetchYandexProfile = async (accessToken: string): Promise<YandexRawProfile
   if (!response.ok) {
     throw new Error("Failed to fetch Yandex profile");
   }
-  return (await response.json()) as YandexRawProfile;
+  const rawProfile = (await response.json()) as YandexRawProfile;
+  loger.info("Raw Yandex profile received", { profile: rawProfile });
+  return rawProfile;
 };
 
 const normalizeYandexProfile = (profile: YandexRawProfile): NormalizedYandexProfile => {
