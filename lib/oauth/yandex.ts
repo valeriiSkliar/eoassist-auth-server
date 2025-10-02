@@ -69,8 +69,30 @@ const resolveEffectiveProxyHost = (
   return context.proxyHost ?? null;
 };
 
+const resolveBaseAuthUrl = (context: MiddlewareContext, requestUrl: URL): URL => {
+  const preferredBase =
+    context.domainInfo?.zone === "ru"
+      ? Env.NEXTAUTH_URL_RU ?? Env.NEXTAUTH_URL
+      : Env.NEXTAUTH_URL;
+
+  if (preferredBase) {
+    try {
+      return new URL(preferredBase);
+    } catch (error) {
+      console.warn("Invalid NEXTAUTH_URL value", preferredBase, error);
+    }
+  }
+
+  try {
+    return new URL(requestUrl.origin);
+  } catch {
+    return new URL("/", requestUrl);
+  }
+};
+
 const buildRedirectUri = (requestUrl: URL, context: MiddlewareContext): string => {
-  const target = new URL("/api/lucia/yandex/callback", requestUrl);
+  const base = resolveBaseAuthUrl(context, requestUrl);
+  const target = new URL("/api/lucia/yandex/callback", base);
   const proxyHost = resolveEffectiveProxyHost(requestUrl, context);
   if (proxyHost && shouldUseProxyHost(requestUrl.hostname, proxyHost)) {
     target.protocol = "https:";
