@@ -41,6 +41,8 @@ interface PostMessagesContextType {
   setIsLoading: (value: boolean) => void;
   handleSubmit: (form: HTMLFormElement) => Promise<void>;
   getResolvedOrigin: () => string | null;
+  lastLogin: { provider: string; payload: any } | null;
+  resetLastLogin: () => void;
 }
 
 const PostMessagesContext = createContext<PostMessagesContextType | undefined>(
@@ -249,6 +251,7 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
   const [close, setClose] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLogInSuccess, setIsLogInSuccess] = useState(false);
+  const [lastLogin, setLastLogin] = useState<{ provider: string; payload: any } | null>(null);
   const originHandshakeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const requestOpenerOrigin = useCallback(() => {
@@ -370,6 +373,11 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLogInSuccess(state);
   };
 
+  const resetLastLogin = useCallback(() => {
+    setLastLogin(null);
+    setIsLogInSuccess(false);
+  }, []);
+
   const sendMessageHandler = useCallback(
     (message: MessageDataType) => {
       if (typeof window === "undefined" || !window.opener) {
@@ -478,10 +486,20 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
       setError(null);
       setIsLoadingHendler(false);
       setClose(true);
+      setIsLogInSuccess(true);
+      setLastLogin({ provider: key, payload: value });
     }
 
     if (action === "close-window") {
       setClose(true);
+    }
+
+    if (action === "login") {
+      setError(null);
+      setIsLoadingHendler(false);
+      setClose(true);
+      setIsLogInSuccess(true);
+      setLastLogin({ provider: key, payload: value });
     }
 
     // Handle reset password related messages from parent
@@ -536,6 +554,8 @@ const PostMessagesProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsLoading: setIsLoadingHendler,
         handleSubmit: credintialsFormSubminHendler,
         getResolvedOrigin: resolveTargetOrigin,
+        lastLogin,
+        resetLastLogin,
       }}
     >
       {children}

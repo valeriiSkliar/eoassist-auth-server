@@ -255,5 +255,5 @@ export default function middleware( req: NextRequest, event: NextPage) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+matcher: ["/((?!api/lucia|api/auth|_next/static|_next/image|favicon.ico).*)"],
 }

@@ -2,9 +2,9 @@
 import LoginFormCredintials from "@/components/loginFormCredintials";
 import { useDomainInfo } from "@/hooks/use-domain-info";
 
+import { usePostMessages } from "@/components/provides/postMessage-provider";
 import Fonts from "@/lib/fonts/font-cache";
 import React, { useEffect, useRef, useState } from "react";
-import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { LoginWithGoogle } from "./login-component-google";
 import { LoginWithTelegram } from "./login-component-telegram";
 import { LoginWithYandex } from "./login-component-yandex";
@@ -18,7 +18,12 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
   const [optionsIsOpen, setOptionsIsOpen] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
   const authOptionsRef = useRef<HTMLDivElement>(null);
-  const { originHost: contextOriginHost } = usePostMessages();
+  const {
+    originHost: contextOriginHost,
+    isLogInSuccess,
+    lastLogin,
+    resetLastLogin,
+  } = usePostMessages();
 
   const effectiveOriginHost = contextOriginHost ?? originHost;
 
@@ -51,6 +56,20 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
   };
   return (
     <div id="auth-options" className="space-y-6">
+      {lastLogin && lastLogin.provider === "yandex" && (
+        <div className="rounded-md border border-green-500 bg-green-50 p-3 text-sm text-green-900 flex items-center justify-between">
+          <span>
+            ✅ Yandex login succeeded{lastLogin.payload?.user?.email ? ` (${lastLogin.payload.user.email})` : ""}
+          </span>
+          <button
+            type="button"
+            onClick={resetLastLogin}
+            className="ml-4 text-green-900 underline"
+          >
+            Скрыть
+          </button>
+        </div>
+      )}
       {/* Индикатор зоны и доступных методов авторизации */}
       <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
         {/* <div>
@@ -111,15 +130,13 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
                 </div>
               )}
 
-              {/* Yandex авторизация только для зоны RU */}
-              {domainInfo.zone === "ru" && (
-                <div className="pb-4">
-                  <LoginWithYandex
-                    originHost={effectiveOriginHost ?? ""}
-                    setAuthInProgress={setAuthInProgress}
-                  />
-                </div>
-              )}
+              {/* Yandex авторизация */}
+              <div className="pb-4">
+                <LoginWithYandex
+                  originHost={effectiveOriginHost ?? ""}
+                  setAuthInProgress={setAuthInProgress}
+                />
+              </div>
 
               {/* Для зоны STORE или UNKNOWN показываем Google по умолчанию */}
               {(domainInfo.zone === "store" ||

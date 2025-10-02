@@ -76,7 +76,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Разрешенные домены и поддомены
       const allowedDomains = [
         "localhost",
+        "localhost:3000",
+        "localhost:3001",
         "127.0.0.1",
+        "127.0.0.1:3000",
+        "127.0.0.1:3001",
         "auth.eoassist.store",
         "eoassist.store",
         ".eoassist.store",

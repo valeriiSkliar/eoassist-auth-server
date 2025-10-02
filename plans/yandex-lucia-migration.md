@@ -77,6 +77,7 @@
      ```
    - Within Lucia handlers, import `sanitizeHost`, `resolveProxyHost`, `shouldUseProxyHost` from `auth.config.ts` and read globals (`__NEXT_PRIVATE_PROXY_HOST`, `__DOMAIN_INFO`) for ru-proxy support.
    - Handle errors/redirects mirroring current popup workflow (success, error, close-window messages).
+   - ✅ Added `/api/lucia/yandex/login` & `/api/lucia/yandex/callback`, updated middleware matcher, and return postMessage-ready responses with Lucia session cookies.
 
 5. **Update Frontend Integration**
 
