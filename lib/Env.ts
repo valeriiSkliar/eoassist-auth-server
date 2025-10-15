@@ -26,12 +26,22 @@ export const Env = createEnv({
     API_SERVER_URL: z.string().min(1),
     SHORT_DOMAIN: z.string().min(1),
     DATABASE_URL: z.string().min(1),
+
+    // Analytics
+    GA_ID: z.string().min(1).optional().default(""),
+    TG_MINI_APP_ANALYTICS_TOKEN: z.string().min(1).optional().default(""),
+    TG_MINI_APP_ANALYTICS_IDENTIFIER: z.string().min(1).optional().default(""),
+    IS_TEST_SERVER: z.string().min(1).optional().default("false"),
   },
   client: {
-    // AUTH_SECRET: z.string().min(1),
-    // NEXTAUTH_SECRET: z.string().min(1),
-    // AUTH_GOOGLE_ID: z.string().min(1),
-    // AUTH_GOOGLE_SECRET: z.string().min(1),
+    // Yandex Metrika (client-side, array of counter IDs)
+    NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID: z.preprocess(
+      () =>
+        JSON.parse(
+          process.env.NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID || "[]"
+        ) as number[],
+      z.array(z.number()).default([])
+    ),
   },
   // You need to destructure all the keys manually
   runtimeEnv: {
@@ -57,5 +67,14 @@ export const Env = createEnv({
     API_SERVER_URL: process.env.API_SERVER_URL,
     SHORT_DOMAIN: process.env.SHORT_DOMAIN,
     DATABASE_URL: process.env.DATABASE_URL,
+
+    // Analytics
+    GA_ID: process.env.GA_ID,
+    NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID:
+      process.env.NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID,
+    TG_MINI_APP_ANALYTICS_TOKEN: process.env.TG_MINI_APP_ANALYTICS_TOKEN,
+    TG_MINI_APP_ANALYTICS_IDENTIFIER:
+      process.env.TG_MINI_APP_ANALYTICS_IDENTIFIER,
+    IS_TEST_SERVER: process.env.IS_TEST_SERVER,
   },
 });

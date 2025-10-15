@@ -1,4 +1,5 @@
 import SessionPovider from "@/components/auth/session-povider";
+import MetricsProvider from "@/components/Metrics/MetricsProvider";
 import { AppConfig } from "@/utils/AppConfig";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, useMessages } from "next-intl";
@@ -32,6 +33,9 @@ export default function RootLayout(props: {
             {/* <Footer /> */}
           </div>
         </NextIntlClientProvider>
+
+        {/* Metrics placed at the end of body for optimal performance */}
+        <MetricsProvider />
       </body>
     </html>
   );
