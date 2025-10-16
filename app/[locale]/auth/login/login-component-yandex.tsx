@@ -2,6 +2,7 @@
 
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
+import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { FaYandex } from "react-icons/fa";
@@ -85,6 +86,11 @@ export const LoginWithYandex = ({
     setIsPending(true);
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
+
+    // Отправляем событие в Яндекс.Метрику
+    trackYandexGoal(AuthGoals.AUTHORIZATION, { provider: "yandex" });
+    trackYandexGoal(AuthGoals.AUTHORIZATION_YANDEX);
+
     const targetOrigin = resolvedOriginHost ?? null;
     sendMessage({ action: "startLogin", key: "yandex", value: targetOrigin });
     try {

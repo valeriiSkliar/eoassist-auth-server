@@ -1,6 +1,7 @@
 "use client";
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
+import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
@@ -98,6 +99,11 @@ export const LoginWithTelegram = ({
       });
       return;
     }
+
+    // Отправляем событие в Яндекс.Метрику
+    trackYandexGoal(AuthGoals.AUTHORIZATION, { provider: "telegram" });
+    trackYandexGoal(AuthGoals.AUTHORIZATION_TELEGRAM);
+
     setIsPending(true);
     try {
       const targetOrigin = resolvedOriginHost;

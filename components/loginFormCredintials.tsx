@@ -1,5 +1,6 @@
 "use client";
 import Fonts from "@/lib/fonts/font-cache";
+import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
 import { useTranslations } from "next-intl";
 import { useMemo, useRef, type FC } from "react";
 import { MdAlternateEmail } from "react-icons/md";
@@ -140,6 +141,11 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
               return;
             }
             e.preventDefault();
+
+            // Отправляем событие в Яндекс.Метрику
+            trackYandexGoal(AuthGoals.AUTHORIZATION, { provider: "email" });
+            trackYandexGoal(AuthGoals.AUTHORIZATION_EMAIL);
+
             if (formRef.current) {
               handleSubmit(formRef.current);
             }

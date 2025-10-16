@@ -3,6 +3,7 @@
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
+import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -94,6 +95,11 @@ export const LoginWithGoogle = ({
     setIsPendingState(true);
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
+
+    // Отправляем событие в Яндекс.Метрику
+    trackYandexGoal(AuthGoals.AUTHORIZATION, { provider: "google" });
+    trackYandexGoal(AuthGoals.AUTHORIZATION_GOOGLE);
+
     startTransition(async () => {
       const targetOrigin = resolvedOriginHost ?? null;
       sendMessage({
