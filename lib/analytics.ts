@@ -1,5 +1,11 @@
 import ym from "react-yandex-metrika";
-import { Env } from "@/lib/Env";
+import { getYandexMetrikaCounterIds } from "@/lib/yandexMetrikaConfig";
+
+declare global {
+  interface Window {
+    ym?: (...args: Array<number | string | Record<string, any>>) => void;
+  }
+}
 
 /**
  * Отправляет событие достижения цели в Яндекс.Метрику
@@ -20,9 +26,8 @@ export const trackYandexGoal = (
   params?: Record<string, any>
 ) => {
   // Проверяем, что метрика доступна и настроена
-  const hasAccounts =
-    Env.NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID &&
-    Env.NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID.length > 0;
+  const accountIds = getYandexMetrikaCounterIds();
+  const hasAccounts = accountIds.length > 0;
 
   if (!hasAccounts) {
     // В development режиме выводим информацию в консоль
@@ -38,8 +43,24 @@ export const trackYandexGoal = (
   }
 
   try {
-    // Отправляем событие во все настроенные счетчики
-    ym("reachGoal", goalId, params);
+    let sentViaGlobalYm = false;
+
+    if (typeof window !== "undefined" && typeof window.ym === "function") {
+      accountIds.forEach((accountId) => {
+        const args = params
+          ? ([accountId, "reachGoal", goalId, params] as const)
+          : ([accountId, "reachGoal", goalId] as const);
+
+        window.ym?.(...args);
+      });
+
+      sentViaGlobalYm = true;
+    }
+
+    // Отправляем событие во все настроенные счетчики (fallback)
+    if (!sentViaGlobalYm) {
+      ym("reachGoal", goalId, params);
+    }
 
     // Логируем в development режиме
     if (process.env.NODE_ENV === "development") {
@@ -47,7 +68,8 @@ export const trackYandexGoal = (
         "%c[YandexMetrika](reachGoal) sent",
         "color: green; font-weight: bold",
         goalId,
-        params || ""
+        params || "",
+        `[counters: ${accountIds.join(", ")}]`
       );
     }
   } catch (error) {
