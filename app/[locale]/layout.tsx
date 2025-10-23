@@ -2,6 +2,7 @@ import SessionPovider from "@/components/auth/session-povider";
 import { AppConfig } from "@/utils/AppConfig";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, useMessages } from "next-intl";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -23,6 +24,28 @@ export default function RootLayout(props: {
   return (
     <html lang={locale}>
       <body className={inter.className}>
+        <Script id="yandex-metrika" strategy="afterInteractive">
+          {`
+            (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+            ym(103284779, "init", {
+                 clickmap:true,
+                 trackLinks:true,
+                 accurateTrackBounce:true,
+                 webvisor:true
+            });
+          `}
+        </Script>
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html:
+              '<div><img src="https://mc.yandex.ru/watch/103284779" style="position:absolute; left:-9999px;" alt="" /></div>'
+          }}
+        />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col justify-between w-full h-full min-h-screen">
             {/* <Header /> */}
