@@ -4,7 +4,7 @@ import type { LocalePrefix } from '../node_modules/next-intl/dist/types/src/rout
 import localeConfig from './generated/locale-config.json';
 
 
-const localePrefix: LocalePrefix = 'never';
+const localePrefix = (localeConfig.localePrefix ?? 'always') as LocalePrefix;
 
 // export const AppConfig = {
 //   name: 'EOAssist',
