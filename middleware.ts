@@ -23,7 +23,7 @@ export function getSubdomain(url: string): string  {
   // The subdomain is the part before the top-level domain
   return hostnameParts?.[0] ?? '';
 }
-let publicPages = ['/','sites/*','about',]
+let publicPages = ['/','sites/*','about','test-metrika']
 
 const { auth } = NextAuth(authConfig);
 const intlMiddleware = createIntlMiddleware({
@@ -35,7 +35,7 @@ const intlMiddleware = createIntlMiddleware({
  const  authMiddleware = auth(
   async (request) => {
     request.cookies.set('Authorization', `Bearer ${generateApiKey()}`);
-    const response = NextResponse.next()
+    const response = intlMiddleware(request);
     
     // Определяем доменную зону (учитывая URL параметры, включая mirror)
     const requestUrl = new URL(request.url);
