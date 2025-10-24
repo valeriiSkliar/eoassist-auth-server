@@ -73,27 +73,6 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
           </button>
         </div>
       )}
-      {/* Индикатор зоны и доступных методов авторизации */}
-      {/* <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
-        <div>
-          <strong>Зона:</strong> {domainInfo.zone} |<strong> Домен:</strong>{" "}
-          {domainInfo.fullDomain} |<strong> Базовый:</strong>{" "}
-          {domainInfo.baseDomain}
-          {domainInfo.subdomain && (
-            <span>
-              {" "}
-              | <strong>Поддомен:</strong> {domainInfo.subdomain}
-            </span>
-          )}
-        </div>
-        <div className="mt-1">
-          <strong>Доступные методы:</strong> Telegram, Email +
-          {domainInfo.zone === "com" && " Google"}
-          {domainInfo.zone === "ru" && " Yandex"}
-          {(domainInfo.zone === "store" || domainInfo.zone === "unknown") &&
-            " Google (по умолчанию)"}
-        </div>
-      </div> */}
 
       <LoginWithTelegram
         domainZone={domainInfo.zone}
