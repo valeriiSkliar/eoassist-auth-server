@@ -1,6 +1,7 @@
 "use client";
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
+import { trackYandexMetrikaGoal } from "@/lib/yandex-metrika";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
@@ -88,6 +89,10 @@ export const LoginWithTelegram = ({
     //   return;
     // }
     e.preventDefault();
+
+    // Track Telegram login in Yandex Metrika
+    trackYandexMetrikaGoal('TGavtor');
+
     if (!resolvedOriginHost) {
       sendMessage({
         action: "error",

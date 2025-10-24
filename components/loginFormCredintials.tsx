@@ -1,5 +1,6 @@
 "use client";
 import Fonts from "@/lib/fonts/font-cache";
+import { trackYandexMetrikaGoal } from "@/lib/yandex-metrika";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, type FC } from "react";
 import { MdAlternateEmail } from "react-icons/md";
@@ -154,6 +155,10 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
               return;
             }
             e.preventDefault();
+
+            // Track email/password login in Yandex Metrika
+            trackYandexMetrikaGoal('Emailavtor');
+
             if (formRef.current) {
               handleSubmit(formRef.current);
             }

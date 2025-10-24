@@ -3,6 +3,7 @@
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
+import { trackYandexMetrikaGoal } from "@/lib/yandex-metrika";
 import { signIn, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -91,6 +92,10 @@ export const LoginWithGoogle = ({
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    // Track Google login in Yandex Metrika
+    trackYandexMetrikaGoal('Googleavtor');
+
     setIsPendingState(true);
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");

@@ -2,6 +2,7 @@
 
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
+import { trackYandexMetrikaGoal } from "@/lib/yandex-metrika";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { FaYandex } from "react-icons/fa";
@@ -82,6 +83,10 @@ export const LoginWithYandex = ({
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    // Track Yandex login in Yandex Metrika
+    trackYandexMetrikaGoal('Yandexavtor');
+
     setIsPending(true);
     setAuthInProgress(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
