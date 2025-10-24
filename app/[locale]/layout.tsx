@@ -1,9 +1,10 @@
 import SessionPovider from "@/components/auth/session-povider";
+import { Env } from "@/lib/Env";
 import { AppConfig } from "@/utils/AppConfig";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, useMessages } from "next-intl";
-import Script from "next/script";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -11,7 +12,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Eoassist authentication",
   description: "This is an page for authentication on Eoassist.com",
-  robots: "noindex, nofollow"
+  robots: "noindex, nofollow",
 };
 
 export default function RootLayout(props: {
@@ -24,8 +25,11 @@ export default function RootLayout(props: {
   return (
     <html lang={locale}>
       <body className={inter.className}>
-        <Script id="yandex-metrika" strategy="afterInteractive">
-          {`
+        {/* Yandex Metrika */}
+        {Env.NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID.map((id) => (
+          <>
+            <Script id={`yandex-metrika-${id}`} strategy="afterInteractive">
+              {`
             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
             m[i].l=1*new Date();
             for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
@@ -39,13 +43,14 @@ export default function RootLayout(props: {
                  webvisor:true
             });
           `}
-        </Script>
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html:
-              '<div><img src="https://mc.yandex.ru/watch/103284779" style="position:absolute; left:-9999px;" alt="" /></div>'
-          }}
-        />
+            </Script>
+            <noscript
+              dangerouslySetInnerHTML={{
+                __html: `<div><img src="https://mc.yandex.ru/watch/${id}" style="position:absolute; left:-9999px;" alt="" /></div>`,
+              }}
+            />
+          </>
+        ))}
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col justify-between w-full h-full min-h-screen">
             {/* <Header /> */}
