@@ -1,5 +1,6 @@
 import SessionPovider from "@/components/auth/session-povider";
 import { Env } from "@/lib/Env";
+import GoogleTagManager from "@/Metrics/GoogleTagManager/GoogleTagManager";
 import { AppConfig } from "@/utils/AppConfig";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, useMessages } from "next-intl";
@@ -51,6 +52,7 @@ export default function RootLayout(props: {
             />
           </>
         ))}
+        <GoogleTagManager gtmId={Env.GTM_ID} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col justify-between w-full h-full min-h-screen">
             {/* <Header /> */}

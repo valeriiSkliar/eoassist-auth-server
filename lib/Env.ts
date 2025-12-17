@@ -31,6 +31,7 @@ export const Env = createEnv({
     TG_MINI_APP_ANALYTICS_TOKEN: z.string().min(1).optional().default(""),
     TG_MINI_APP_ANALYTICS_IDENTIFIER: z.string().min(1).optional().default(""),
     IS_TEST_SERVER: z.string().min(1).optional().default("false"),
+    GTM_ID: z.string().min(1).optional().default(""),
   },
   client: {
     // AUTH_SECRET: z.string().min(1),
@@ -39,6 +40,7 @@ export const Env = createEnv({
     // AUTH_GOOGLE_SECRET: z.string().min(1),
 
     // Yandex Metrika (client-side, array of counter IDs)
+    NEXT_PUBLIC_GTM_ID: z.string().min(1).optional().default(""), 
     NEXT_PUBLIC_YANDEX_METRIKA_ACCOUNTS_ID: z.preprocess(
       () =>
         JSON.parse(
@@ -78,5 +80,7 @@ export const Env = createEnv({
     TG_MINI_APP_ANALYTICS_IDENTIFIER:
       process.env.TG_MINI_APP_ANALYTICS_IDENTIFIER,
     IS_TEST_SERVER: process.env.IS_TEST_SERVER,
+    GTM_ID: process.env.GTM_ID,
+    NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
   },
 });
