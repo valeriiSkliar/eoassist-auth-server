@@ -2,7 +2,7 @@
 import Fonts from "@/lib/fonts/font-cache";
 import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
 import { useTranslations } from "next-intl";
-import { useMemo, useRef, type FC } from "react";
+import { useEffect, useMemo, useRef, useState, type FC } from "react";
 import { MdAlternateEmail } from "react-icons/md";
 import {
   AgreementCheckbox,
@@ -35,6 +35,16 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
   const t = useTranslations("signIn");
 
   const formRef = useRef<HTMLFormElement>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Очистка полей из памяти при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      setEmail("");
+      setPassword("");
+    };
+  }, []);
 
   const sanitizeCandidate = (candidate: string | null | undefined): string | null => {
     if (!candidate) {
@@ -107,6 +117,8 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
             type="email"
             name="email"
             placeholder={t("emailPlaceholder")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="space-y-2">
@@ -119,6 +131,8 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
             type="password"
             name="password"
             placeholder={t("passwordPlaceholder")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <ResetPasswordDialog closeDelay={1000}>
             <Button variant="link" className="px-0">
@@ -150,7 +164,7 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
               handleSubmit(formRef.current);
             }
           }}
-          disabled={isLoading || !isAgreed}
+          disabled={isLoading || !isAgreed || !email.trim() || !password.trim()}
           type="button"
           className="w-full bg-third"
         >
