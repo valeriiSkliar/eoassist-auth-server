@@ -1,5 +1,7 @@
 import SessionPovider from "@/components/auth/session-povider";
 import MetricsProvider from "@/components/Metrics/MetricsProvider";
+import { Env } from "@/lib/Env";
+import GoogleTagManager from "@/Metrics/GoogleTagManager/GoogleTagManager";
 import { AppConfig } from "@/utils/AppConfig";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, useMessages } from "next-intl";
@@ -11,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Eoassist authentication",
   description: "This is an page for authentication on Eoassist.com",
-  robots: "noindex, nofollow"
+  robots: "noindex, nofollow",
 };
 
 export default function RootLayout(props: {
@@ -24,6 +26,7 @@ export default function RootLayout(props: {
   return (
     <html lang={locale}>
       <body className={inter.className}>
+        <GoogleTagManager gtmId={Env.GTM_ID} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col justify-between w-full h-full min-h-screen">
             {/* <Header /> */}

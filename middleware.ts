@@ -25,7 +25,7 @@ export function getSubdomain(url: string): string  {
 }
 let publicPages = ['/','sites/*','about','test-metrika']
 
-const { auth } = NextAuth(authConfig);
+const { auth } = NextAuth({ ...authConfig, trustHost: true });
 const intlMiddleware = createIntlMiddleware({
   locales: AppConfig.locales,
   localePrefix: AppConfig.localePrefix,
