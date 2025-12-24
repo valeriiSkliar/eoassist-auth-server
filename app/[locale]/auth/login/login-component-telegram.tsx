@@ -1,4 +1,6 @@
 "use client";
+import { useAuthMode } from "@/components/provides/auth-mode-provider";
+import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
@@ -17,12 +19,15 @@ export const LoginWithTelegram = ({
   const { data: session } = useSession();
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const t = useTranslations("signIn");
+  const tSignIn = useTranslations("signIn");
+  const tSignUp = useTranslations("signUp");
   const {
     sendMessage,
     originHost: contextOriginHost,
     getResolvedOrigin,
   } = usePostMessages();
+  const { isAgreed, highlightCheckbox } = useDataAgreement();
+  const { isRegister } = useAuthMode();
 
   const sanitizeCandidate = (candidate: string | null | undefined): string | null => {
     if (!candidate) {
@@ -81,20 +86,18 @@ export const LoginWithTelegram = ({
 
     return null;
   }, [getResolvedOrigin, contextOriginHost, originHost]);
-  // const { isAgreed, highlightCheckbox} = useDataAgreement();
-
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    //   if (!isAgreed) {
-    //   highlightCheckbox();
-    //   return;
-    // }
     e.preventDefault();
+    if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
     if (!resolvedOriginHost) {
       sendMessage({
         action: "error",
         key: "originHost",
         value: {
-          message: t("errors.originHostNotDefined"),
+          message: tSignIn("errors.originHostNotDefined"),
         },
       });
       return;
@@ -123,10 +126,10 @@ export const LoginWithTelegram = ({
         setTelegramLink(telegramLinkResponse.data);
         setError(null);
       } else {
-        setError(telegramLinkResponse.error ?? t("errors.general"));
+        setError(telegramLinkResponse.error ?? tSignIn("errors.general"));
       }
     } catch (fetchError) {
-      setError(t("errors.general"));
+      setError(tSignIn("errors.general"));
     } finally {
       setIsPending(false);
     }
@@ -156,16 +159,20 @@ export const LoginWithTelegram = ({
       window.close();
     }
   }, [session, telegramLink, error, sendMessage]);
+  const buttonText = isRegister
+    ? tSignUp("signUpWithTelegram")
+    : tSignIn("signInWithTelegram");
+
   return (
     <Button
-      disabled={isPending}
+      disabled={isPending || !isAgreed}
       type="button"
       onClick={startLogin}
       variant="outline"
       className="w-full"
     >
       <FaTelegram className="mr-2 h-5 w-5" />
-      {t("signInWithTelegram")}
+      {buttonText}
     </Button>
   );
 };

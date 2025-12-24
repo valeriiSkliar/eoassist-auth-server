@@ -33,6 +33,8 @@ export const Env = createEnv({
     TG_MINI_APP_ANALYTICS_IDENTIFIER: z.string().min(1).optional().default(""),
     IS_TEST_SERVER: z.string().min(1).optional().default("false"),
     GTM_ID: z.string().min(1).optional().default(""),
+    PAGE_TITLE: z.string().min(1).optional().default("Eoassist authentication"),
+    PAGE_DESCRIPTION: z.string().min(1).optional().default("This is an page for authentication on Eoassist.com"),
   },
   client: {
     NEXT_PUBLIC_GTM_ID: z.string().min(1).optional().default(""),
@@ -80,5 +82,7 @@ export const Env = createEnv({
     IS_TEST_SERVER: process.env.IS_TEST_SERVER,
     NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
     GTM_ID: process.env.GTM_ID,
+    PAGE_TITLE: process.env.PAGE_TITLE,
+    PAGE_DESCRIPTION: process.env.PAGE_DESCRIPTION,
   },
 });

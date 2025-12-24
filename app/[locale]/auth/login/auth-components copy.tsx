@@ -4,7 +4,7 @@ import { useDomainInfo } from "@/hooks/use-domain-info";
 
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import Fonts from "@/lib/fonts/font-cache";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { LoginWithGoogle } from "./login-component-google";
 import { LoginWithTelegram } from "./login-component-telegram";
 import { LoginWithYandex } from "./login-component-yandex";
@@ -15,45 +15,17 @@ interface AuthComponentsProps {
 }
 
 const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
-  const [optionsIsOpen, setOptionsIsOpen] = useState(false);
-  const [authInProgress, setAuthInProgress] = useState(false);
-  const authOptionsRef = useRef<HTMLDivElement>(null);
   const {
     originHost: contextOriginHost,
-    isLogInSuccess,
     lastLogin,
     resetLastLogin,
   } = usePostMessages();
 
   const effectiveOriginHost = contextOriginHost ?? originHost;
 
-  // Демонстрация работы новой системы определения доменной зоны
+  // Определение доменной зоны для показа соответствующих методов авторизации
   const domainInfo = useDomainInfo();
 
-  useEffect(() => {
-    const ongoingAuth = sessionStorage.getItem("ongoingAuth");
-    if (ongoingAuth) {
-      setAuthInProgress(true);
-      setOptionsIsOpen(true);
-      sessionStorage.removeItem("ongoingAuth");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (optionsIsOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [optionsIsOpen]);
-
-  const toggleOptions = () => {
-    setOptionsIsOpen(!optionsIsOpen);
-  };
   return (
     <div id="auth-options" className="space-y-6">
       {lastLogin && lastLogin.provider === "yandex" && (
@@ -73,32 +45,24 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
           </button>
         </div>
       )}
-      {/* Индикатор зоны и доступных методов авторизации */}
-      {/* <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
-        <div>
-          <strong>Зона:</strong> {domainInfo.zone} |<strong> Домен:</strong>{" "}
-          {domainInfo.fullDomain} |<strong> Базовый:</strong>{" "}
-          {domainInfo.baseDomain}
-          {domainInfo.subdomain && (
-            <span>
-              {" "}
-              | <strong>Поддомен:</strong> {domainInfo.subdomain}
-            </span>
-          )}
-        </div>
-        <div className="mt-1">
-          <strong>Доступные методы:</strong> Telegram, Email +
-          {domainInfo.zone === "com" && " Google"}
-          {domainInfo.zone === "ru" && " Yandex"}
-          {(domainInfo.zone === "store" || domainInfo.zone === "unknown") &&
-            " Google (по умолчанию)"}
-        </div>
-      </div> */}
 
+      {/* Telegram авторизация */}
       <LoginWithTelegram
         domainZone={domainInfo.zone}
         originHost={effectiveOriginHost ?? ""}
       />
+
+      {/* Google авторизация для зоны COM, STORE или UNKNOWN */}
+      {(domainInfo.zone === "com" ||
+        domainInfo.zone === "store" ||
+        domainInfo.zone === "unknown") && (
+        <LoginWithGoogle originHost={effectiveOriginHost ?? ""} />
+      )}
+
+      {/* Yandex авторизация для зоны RU */}
+      {domainInfo.zone === "ru" && (
+        <LoginWithYandex originHost={effectiveOriginHost ?? ""} />
+      )}
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
@@ -113,60 +77,8 @@ const AuthComponents: React.FC<AuthComponentsProps> = ({ originHost, t }) => {
         </div>
       </div>
 
-      <div className="custom-dropdown">
-        <button onClick={toggleOptions} className="dropdown-toggle">
-          {t.login_options}
-        </button>
-        {optionsIsOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex gap-4 items-center justify-center z-50">
-            <div
-              ref={authOptionsRef}
-              className="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] max-w-[80%] overflow-y-auto"
-            >
-              {/* Google авторизация только для зоны COM */}
-              {domainInfo.zone === "com" && (
-                <div className="pb-4">
-                  <LoginWithGoogle
-                    originHost={effectiveOriginHost ?? ""}
-                    setAuthInProgress={setAuthInProgress}
-                  />
-                </div>
-              )}
-
-              {/* Yandex авторизация */}
-              {domainInfo.zone === "ru" && (
-                <div className="pb-4">
-                  <LoginWithYandex
-                    originHost={effectiveOriginHost ?? ""}
-                    setAuthInProgress={setAuthInProgress}
-                  />
-                </div>
-              )}
-
-              {/* Для зоны STORE или UNKNOWN показываем Google по умолчанию */}
-              {(domainInfo.zone === "store" ||
-                domainInfo.zone === "unknown") && (
-                <div className="pb-4">
-                  <LoginWithGoogle
-                    originHost={effectiveOriginHost ?? ""}
-                    setAuthInProgress={setAuthInProgress}
-                  />
-                </div>
-              )}
-
-              <div className="pb-4">
-                <LoginFormCredintials originHost={effectiveOriginHost ?? ""} />
-              </div>
-              <button
-                onClick={toggleOptions}
-                className="mt-4 w-full bg-gray-200 hover:bg-gray-300 py-4 rounded"
-              >
-                {t.close}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Форма email/пароль */}
+      <LoginFormCredintials originHost={effectiveOriginHost ?? ""} />
     </div>
   );
 };

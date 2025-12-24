@@ -1,5 +1,7 @@
 "use client";
 
+import { useAuthMode } from "@/components/provides/auth-mode-provider";
+import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
@@ -12,15 +14,18 @@ export const LoginWithYandex = ({
   setAuthInProgress,
 }: {
   originHost: string;
-  setAuthInProgress: CallableFunction;
+  setAuthInProgress?: CallableFunction;
 }) => {
   const {
     sendMessage,
     originHost: contextOriginHost,
     getResolvedOrigin,
   } = usePostMessages();
+  const { isAgreed, highlightCheckbox } = useDataAgreement();
+  const { isRegister } = useAuthMode();
 
-  const t = useTranslations("signIn");
+  const tSignIn = useTranslations("signIn");
+  const tSignUp = useTranslations("signUp");
   const [isPending, setIsPending] = useState(false);
 
   const sanitizeCandidate = (candidate: string | null | undefined): string | null => {
@@ -83,8 +88,12 @@ export const LoginWithYandex = ({
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
     setIsPending(true);
-    setAuthInProgress(true);
+    setAuthInProgress?.(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
 
     // Отправляем событие в Яндекс.Метрику
@@ -108,7 +117,7 @@ export const LoginWithYandex = ({
 
       if (!response.ok) {
         const errorPayload = await response.json().catch(() => ({ error: "Request failed" }));
-        const message = errorPayload?.error ?? t("errors.general");
+        const message = errorPayload?.error ?? tSignIn("errors.general");
         throw new Error(message);
       }
 
@@ -119,28 +128,32 @@ export const LoginWithYandex = ({
 
       window.location.assign(data.authorizationUrl);
     } catch (error) {
-      const message = error instanceof Error ? error.message : t("errors.general");
+      const message = error instanceof Error ? error.message : tSignIn("errors.general");
       sendMessage({
         action: "error",
         key: "yandex",
         value: { message },
       });
-      setAuthInProgress(false);
+      setAuthInProgress?.(false);
     } finally {
       setIsPending(false);
     }
   };
 
+  const buttonText = isRegister
+    ? tSignUp("signUpWithYandex")
+    : tSignIn("signInWithYandex");
+
   return (
     <Button
-      disabled={isPending}
+      disabled={isPending || !isAgreed}
       type="button"
       onClick={startLogin}
       variant="outline"
       className="w-full"
     >
       <FaYandex className="mr-2 h-5 w-5" />
-      {t("signInWithYandex")}
+      {buttonText}
     </Button>
   );
 };

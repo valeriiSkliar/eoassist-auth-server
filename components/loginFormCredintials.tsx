@@ -1,9 +1,9 @@
 "use client";
+import { AuthGoals, trackYandexGoal } from "@/lib/analytics";
 import Fonts from "@/lib/fonts/font-cache";
-import { trackYandexGoal, AuthGoals } from "@/lib/analytics";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, type FC } from "react";
-import { MdAlternateEmail } from "react-icons/md";
+import { useAuthMode } from "./provides/auth-mode-provider";
 import {
   AgreementCheckbox,
   useDataAgreement,
@@ -32,7 +32,9 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
     getResolvedOrigin,
   } = usePostMessages();
   const { isAgreed, highlightCheckbox } = useDataAgreement();
-  const t = useTranslations("signIn");
+  const { isRegister, toggleMode } = useAuthMode();
+  const tSignIn = useTranslations("signIn");
+  const tSignUp = useTranslations("signUp");
 
   const formRef = useRef<HTMLFormElement>(null);
   const [email, setEmail] = useState("");
@@ -46,7 +48,9 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
     };
   }, []);
 
-  const sanitizeCandidate = (candidate: string | null | undefined): string | null => {
+  const sanitizeCandidate = (
+    candidate: string | null | undefined
+  ): string | null => {
     if (!candidate) {
       return null;
     }
@@ -68,7 +72,10 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
       return null;
     }
 
-    if (typeof window !== "undefined" && normalized === window.location.origin) {
+    if (
+      typeof window !== "undefined" &&
+      normalized === window.location.origin
+    ) {
       return null;
     }
 
@@ -104,48 +111,54 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
     return null;
   }, [getResolvedOrigin, contextOriginHost, originHost]);
 
+  const buttonText = isRegister
+    ? tSignUp("signUpButton")
+    : tSignIn("signInButton");
+
   return (
     <>
       <form ref={formRef} className={`space-y-6 ${className}`}>
         <div className="space-y-2">
           <Label className={`${Fonts.roboto} text-fourth`} htmlFor="email">
-            {t("email")}
+            {tSignIn("email")}
           </Label>
           <Input
             disabled={isLoading}
             id="email"
             type="email"
             name="email"
-            placeholder={t("emailPlaceholder")}
+            placeholder={tSignIn("emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="space-y-2">
           <Label className={`${Fonts.roboto} text-fourth`} htmlFor="password">
-            {t("password")}
+            {tSignIn("password")}
           </Label>
           <Input
             disabled={isLoading}
             id="password"
             type="password"
             name="password"
-            placeholder={t("passwordPlaceholder")}
+            placeholder={tSignIn("passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <ResetPasswordDialog closeDelay={1000}>
-            <Button variant="link" className="px-0">
-              {t("forgotPassword")}
-            </Button>
-          </ResetPasswordDialog>
+          {!isRegister && (
+            <ResetPasswordDialog closeDelay={1000}>
+              <Button variant="link" className="px-0">
+                {tSignIn("forgotPassword")}
+              </Button>
+            </ResetPasswordDialog>
+          )}
         </div>
         <input
           type="hidden"
           name="callbackUrl"
           value={resolvedOriginHost ?? ""}
         />
-
+        {/* Чекбокс согласия с политикой конфиденциальности */}
         <AgreementCheckbox />
 
         <Button
@@ -168,10 +181,23 @@ const LoginFormCredintials: FC<LoginFormCredintialsProps> = ({
           type="button"
           className="w-full bg-third"
         >
-          <MdAlternateEmail className="mr-2 h-5 w-5" />
-          {t("signInButton")}
+          {buttonText}
         </Button>
         {error && <p className="text-destructive">{error}</p>}
+
+        {/* Ссылка переключения режима */}
+        <div className="text-center text-sm">
+          <span className="text-muted-foreground">
+            {isRegister ? tSignUp("hasAccount") : tSignIn("noAccount")}{" "}
+          </span>
+          <button
+            type="button"
+            onClick={toggleMode}
+            className="text-third hover:underline font-medium"
+          >
+            {isRegister ? tSignUp("login") : tSignIn("register")}
+          </button>
+        </div>
       </form>
     </>
   );

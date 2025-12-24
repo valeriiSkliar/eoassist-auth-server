@@ -15,6 +15,8 @@
     "passwordPlaceholder": "Enter your password",
     "signInButton": "Sign in",
     "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
     "errors": {
       "general": "An error occurred. Please try again.",
       "originHostNotDefined": "Origin host is not defined"
@@ -23,6 +25,17 @@
       "checkbox": "I agree to the terms and conditions ",
       "policy": "Privacy Policy"
     }
+  },
+  "signUp": {
+    "title": "Create an account",
+    "welcome": "Welcome! Please fill in your details to register.",
+    "orContinueWith": "Or register with",
+    "signUpWithGoogle": "Register with Google",
+    "signUpWithYandex": "Register with Yandex",
+    "signUpWithTelegram": "Register with Telegram",
+    "signUpButton": "Register",
+    "hasAccount": "Already have an account?",
+    "login": "Sign in"
   },
   "resetPassword": {
     "resetPasswordTitle": "Reset Password",

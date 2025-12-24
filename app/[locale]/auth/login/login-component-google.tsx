@@ -1,5 +1,7 @@
 "use client";
 
+import { useAuthMode } from "@/components/provides/auth-mode-provider";
+import { useDataAgreement } from "@/components/provides/data-agreement-provider";
 import { usePostMessages } from "@/components/provides/postMessage-provider";
 import { Button } from "@/components/ui/button";
 import Fonts from "@/lib/fonts/font-cache";
@@ -19,7 +21,7 @@ export const LoginWithGoogle = ({
   setAuthInProgress,
 }: {
   originHost: string;
-  setAuthInProgress: CallableFunction;
+  setAuthInProgress?: CallableFunction;
 }) => {
   const { data: session } = useSession();
   const {
@@ -27,9 +29,12 @@ export const LoginWithGoogle = ({
     originHost: contextOriginHost,
     getResolvedOrigin,
   } = usePostMessages();
+  const { isAgreed, highlightCheckbox } = useDataAgreement();
+  const { isRegister } = useAuthMode();
 
-  const t = useTranslations("signIn");
-  const [isPending, startTransition] = useTransition();
+  const tSignIn = useTranslations("signIn");
+  const tSignUp = useTranslations("signUp");
+  const [, startTransition] = useTransition();
   const [isPendingState, setIsPendingState] = useState(false);
 
   const sanitizeCandidate = (candidate: string | null | undefined): string | null => {
@@ -92,8 +97,12 @@ export const LoginWithGoogle = ({
 
   const startLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (!isAgreed) {
+      highlightCheckbox();
+      return;
+    }
     setIsPendingState(true);
-    setAuthInProgress(true);
+    setAuthInProgress?.(true);
     sessionStorage.setItem("ongoingAuth", "yandex");
 
     // Отправляем событие в Яндекс.Метрику
@@ -135,24 +144,26 @@ export const LoginWithGoogle = ({
           redirectLink: redirectLink, // Добавляем redirectLink для правильного редиректа
         },
       });
-      setAuthInProgress(false);
+      setAuthInProgress?.(false);
       sessionStorage.removeItem("ongoingAuth");
       window.close();
     }
   }, [session, sendMessage, setAuthInProgress, resolvedOriginHost]);
 
+  const buttonText = isRegister
+    ? tSignUp("signUpWithGoogle")
+    : tSignIn("signInWithGoogle");
+
   return (
     <Button
       type="button"
-      disabled={isPendingState}
+      disabled={isPendingState || !isAgreed}
       onClick={startLogin}
       variant="outline"
       className={`w-full text-fourth ${Fonts.raleway}`}
     >
-      <>
-        <FaGoogle className="mr-2 h-5 w-5" />
-        {t("signInWithGoogle")}
-      </>
+      <FaGoogle className="mr-2 h-5 w-5" />
+      {buttonText}
     </Button>
   );
 };

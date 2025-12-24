@@ -11,8 +11,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Eoassist authentication",
-  description: "This is an page for authentication on Eoassist.com",
+  title: Env.PAGE_TITLE,
+  description: Env.PAGE_DESCRIPTION,
   robots: "noindex, nofollow",
 };
 

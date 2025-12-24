@@ -1,13 +1,20 @@
+"use client";
 import AuthComponents from "@/app/[locale]/auth/login/auth-components copy";
 import Fonts from "@/lib/fonts/font-cache";
+import { useTranslations } from "next-intl";
+import { AuthModeProvider, useAuthMode } from "./provides/auth-mode-provider";
 
-const SignInComponent = ({
-  originHost,
-  translations,
-}: {
-  originHost: string;
-  translations: any;
-}) => {
+const SignInComponentInner = ({ originHost }: { originHost: string }) => {
+  const { isRegister } = useAuthMode();
+  const tSignIn = useTranslations("signIn");
+  const tSignUp = useTranslations("signUp");
+
+  const title = isRegister ? tSignUp("title") : tSignIn("title");
+  const welcome = isRegister ? tSignUp("welcome") : tSignIn("welcome");
+  const orContinueWith = isRegister
+    ? tSignUp("orContinueWith")
+    : tSignIn("orContinueWith");
+
   return (
     <div className="flex min-h-full flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md space-y-8">
@@ -16,25 +23,35 @@ const SignInComponent = ({
           <h2
             className={`text-3xl font-bold tracking-tight text-fourth ${Fonts.raleway.className}`}
           >
-            {translations?.title}
+            {title}
           </h2>
           <p
             className={`text-muted-foreground text-fourth ${Fonts.raleway.className}`}
           >
-            {translations.welcome}
+            {welcome}
           </p>
         </div>
         <AuthComponents
           t={{
-            orContinueWith: translations.orContinueWith,
-            login_options: translations.login_options,
-            email_password: translations.email_password,
-            close: translations.close,
+            orContinueWith,
           }}
           originHost={originHost}
         />
       </div>
     </div>
+  );
+};
+
+const SignInComponent = ({
+  originHost,
+}: {
+  originHost: string;
+  translations?: any;
+}) => {
+  return (
+    <AuthModeProvider>
+      <SignInComponentInner originHost={originHost} />
+    </AuthModeProvider>
   );
 };
 

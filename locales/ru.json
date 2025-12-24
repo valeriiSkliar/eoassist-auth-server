@@ -15,6 +15,8 @@
     "passwordPlaceholder": "Введите ваш пароль",
     "signInButton": "Войти",
     "forgotPassword": "Забыли пароль?",
+    "noAccount": "Нет аккаунта?",
+    "register": "Зарегистрироваться",
     "errors": {
       "general": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
       "originHostNotDefined": "Исходный хост не определен"
@@ -23,6 +25,17 @@
       "checkbox": "Я согласен на обработку моих персональных данных и ознакомлен(а) с ",
       "policy": "Политикой конфиденциальности"
     }
+  },
+  "signUp": {
+    "title": "Создайте аккаунт",
+    "welcome": "Добро пожаловать! Заполните данные для регистрации.",
+    "orContinueWith": "Или зарегистрироваться с помощью",
+    "signUpWithGoogle": "Зарегистрироваться через Google",
+    "signUpWithYandex": "Зарегистрироваться через Яндекс",
+    "signUpWithTelegram": "Зарегистрироваться через Telegram",
+    "signUpButton": "Зарегистрироваться",
+    "hasAccount": "Уже есть аккаунт?",
+    "login": "Войти"
   },
   "resetPassword": {
     "resetPasswordTitle": "Сброс пароля",
